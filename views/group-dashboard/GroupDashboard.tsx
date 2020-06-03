@@ -15,7 +15,7 @@ import { Formik } from 'formik';
 const dummyUsers = [
   { username: 'Jae', doneToday: 'false', total: 15 },
   { username: 'Charlie', doneToday: 'true', total: 7 },
-  { username: 'Brianna', doneToday: 'true', total: 20 },
+  { username: 'Brianna', doneToday: 'false', total: 20 },
   { username: 'Steve', doneToday: 'false', total: 5 },
 ];
 
