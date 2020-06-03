@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { SafeAreaView, View, StyleSheet, FlatList, Modal, Button as RButton, TextInput } from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  StyleSheet,
+  FlatList,
+  Modal,
+  Button as RButton,
+  TextInput,
+} from 'react-native';
 import styled from 'styled-components/native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
@@ -11,7 +19,7 @@ const dummyUsers = [
   { username: 'Steve', doneToday: 'false', total: 5 },
 ];
 
-const GroupDashboard: React.FC<any> = ({ route, navigation }) => {  
+const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
   const { groupName } = route.params;
   //! Send QUERY here with groupID, which should populate groupInformation (below), which is our local state for the current group
   const [groupInformation, setGroupInformation] = React.useState({
@@ -22,20 +30,21 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
     deadline: Date.now(),
     users: ['Jae', 'Steve', 'Charlie', 'Brianna'],
   });
-  console.log(groupInformation)
+  console.log(groupInformation);
   const [completeModalVisible, setCompleteModalVisible] = React.useState(false);
   const [editModalVisible, setEditModalVisible] = React.useState(false);
-  
+
   navigation.setOptions({
     headerTitle: groupName,
     headerRight: () => (
-      <RButton
-        title='Edit'
-        color='black'
+      <Button
+        style={{ marginRight: 20 }}
         onPress={() => {
           setEditModalVisible(true);
         }}
-      />
+      >
+        <Text>Edit</Text>
+      </Button>
     ),
   });
 
@@ -70,35 +79,35 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
                   users: groupInformation.users,
                 }}
                 onSubmit={(values) => {
-                  setGroupInformation(prevState => {
+                  setGroupInformation((prevState) => {
                     return {
                       ...prevState,
-                      ...values
-                    }               
-                  })
+                      ...values,
+                    };
+                  });
                   //! NEED TO TRIGGER MUTATION TO DATABASE HERE TO UPDATE CURRENT GROUP
-                  setEditModalVisible(false)
+                  setEditModalVisible(false);
                 }}
               >
                 {(formikProps) => (
                   <View>
-                    <TextInput 
+                    <TextInput
                       onChangeText={formikProps.handleChange('groupName')}
                       value={formikProps.values.groupName}
                     />
-                    <TextInput 
+                    <TextInput
                       onChangeText={formikProps.handleChange('goalName')}
                       value={formikProps.values.goalName}
                     />
-                    <TextInput 
+                    <TextInput
                       onChangeText={formikProps.handleChange('amount')}
                       value={formikProps.values.amount.toString()}
                     />
-                    <TextInput 
+                    <TextInput
                       onChangeText={formikProps.handleChange('charity')}
                       value={formikProps.values.charity}
                     />
-                    <TextInput 
+                    <TextInput
                       onChangeText={formikProps.handleChange('deadline')}
                       value={formikProps.values.deadline.toString()}
                     />
