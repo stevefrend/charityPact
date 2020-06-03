@@ -14,17 +14,19 @@ interface Props {
 const mockGroups = [
   {
     groupName: 'Coworkers',
+    amount: 150,
     goalName: 'Meditate',
     deadline: Date.now(),
     users: ['Jae', 'Steve', 'Charlie', 'Brianna'],
   },
   {
     groupName: 'Friends',
+    amount: 500,
     goalName: 'Run a mile',
     deadline: Date.now(),
     users: ['Jae', 'Steve', 'Charlie'],
   },
-  { groupName: 'Family', goalName: 'Floss', deadline: Date.now(), users: ['Charlie', 'Steve'] },
+  { groupName: 'Family', amount: 1000, goalName: 'Floss', deadline: Date.now(), users: ['Charlie', 'Steve'] },
 ];
 
 const Home: React.FC<any> = ({ navigation }) => {
@@ -32,7 +34,7 @@ const Home: React.FC<any> = ({ navigation }) => {
     return (
       <Button
         onPress={() => {
-          navigation.navigate('GroupDashboard', { groupName: group.groupName});
+          navigation.navigate('GroupDashboard', { groupName: group.groupName });
         }}
         key={index + group.groupName}
       >
@@ -57,7 +59,11 @@ const Home: React.FC<any> = ({ navigation }) => {
           {buttons}
         </Groups>
         <Footer>
-          <Button>
+          <Button
+            onPress={() => {
+              navigation.navigate('NAME OF BRIANNAS COMPONENT');
+            }}
+          >
             <Text large>ADD GROUP</Text>
           </Button>
         </Footer>
