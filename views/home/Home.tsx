@@ -12,16 +12,19 @@ interface Props {
 const mockGroups = [
   {
     groupName: 'Coworkers',
+    amount: 150,
     goalName: 'Meditate',
     deadline: Date.now(),
     users: ['Jae', 'Steve', 'Charlie', 'Brianna'],
   },
   {
     groupName: 'Friends',
+    amount: 500,
     goalName: 'Run a mile',
     deadline: Date.now(),
     users: ['Jae', 'Steve', 'Charlie'],
   },
+  { groupName: 'Family', amount: 1000, goalName: 'Floss', deadline: Date.now(), users: ['Charlie', 'Steve'] },
   { groupName: 'Family', goalName: 'Floss', deadline: Date.now(), users: ['Charlie', 'Steve'] },
 ];
 
@@ -30,13 +33,15 @@ const Home: React.FC<any> = ({ navigation }) => {
     return (
       <Button
         onPress={() => {
-          navigation.navigate('GroupDashboard');
+          navigation.navigate('GroupDashboard', { groupName: group.groupName });
         }}
+        key={index + group.groupName}
       >
-        <Text small>Hey</Text>
+        <Text small>{group.groupName}</Text>
       </Button>
     );
   });
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Container>
@@ -50,15 +55,7 @@ const Home: React.FC<any> = ({ navigation }) => {
           <Text primary large>
             Groups
           </Text>
-          {/* dynamically render buttons in here once we get data*/}
-          <Button
-            onPress={() => {
-              console.log('hit');
-              navigation.navigate('GroupDashboard');
-            }}
-          >
-            <Text small>Hey</Text>
-          </Button>
+          {buttons}
         </Groups>
         <Footer>
           <Button
@@ -127,6 +124,7 @@ const Button = styled.TouchableOpacity`
   padding: 8px;
   background-color: lightpink;
   border-radius: 10px;
+  margin-bottom: 10px;
 `;
 
 export default Home;
