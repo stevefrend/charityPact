@@ -11,10 +11,9 @@ const dummyUsers = [
   { username: 'Steve', doneToday: 'false', total: 5 },
 ];
 
-const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
-  console.log('render')
+const GroupDashboard: React.FC<any> = ({ route, navigation }) => {  
   const { groupName } = route.params;
-  // once we can fetch data, update state to be current group so we can also pass it into edit page
+  //! Send QUERY here with groupID, which should populate groupInformation (below), which is our local state for the current group
   const [groupInformation, setGroupInformation] = React.useState({
     groupName: 'Coworkers',
     amount: 150,
@@ -26,7 +25,9 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
   console.log(groupInformation)
   const [completeModalVisible, setCompleteModalVisible] = React.useState(false);
   const [editModalVisible, setEditModalVisible] = React.useState(false);
+  
   navigation.setOptions({
+    headerTitle: groupName,
     headerRight: () => (
       <RButton
         title='Edit'
@@ -75,7 +76,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
                       ...values
                     }               
                   })
-                  //! NEED TO TRIGGER MUTATION TO DATABASE HERE
+                  //! NEED TO TRIGGER MUTATION TO DATABASE HERE TO UPDATE CURRENT GROUP
                   setEditModalVisible(false)
                 }}
               >
@@ -113,9 +114,6 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
             </ModalBox>
           </ModalView>
         </Modal>
-        <Header>
-          <Text title>{groupInformation.groupName}</Text>
-        </Header>
         <Header>
           <Text large>{} days left</Text>
         </Header>
@@ -182,20 +180,11 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
             <Button
               onPress={() => {
                 setCompleteModalVisible(true);
-                // change user state to complete by triggering mutation to update DB, then re-render component and changes should be there
+                //! change user state to complete by triggering mutation to update DB, then re-render component and changes should be there
               }}
               style={{ backgroundColor: 'lightgreen' }}
             >
               <Text large>COMPLETE FOR TODAY</Text>
-            </Button>
-          </Buttons>
-          <Buttons>
-            <Button
-              onPress={() => {
-                navigation.navigate('NAME OF BRIANNAS COMPONENT');
-              }}
-            >
-              <Text small>EDIT GROUP</Text>
             </Button>
           </Buttons>
         </View>
