@@ -1,18 +1,51 @@
 import * as React from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, View, StyleSheet, FlatList } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
+// import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
+
+const tableStyles = StyleSheet.create({
+  container: { padding: 16, paddingTop: 30, backgroundColor: '#fff' },
+  head: { backgroundColor: '#f1f8ff' },
+  text: { margin: 6 },
+});
+
+const dummyUsers = [
+  { username: 'Jae', doneToday: 'false', total: 15 },
+  { username: 'Charlie', doneToday: 'false', total: 7 },
+  { username: 'Brianna', doneToday: 'true', total: 20 },
+];
 
 const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
   const { groupName } = route.params;
-  console.log(groupName);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Container>
+        <FlatList
+          data={dummyUsers}
+          renderItem={({ item, index }): any => {
+            
+            const checked = item.doneToday === "true" ? "green" : "red";
+            console.log(checked, item.doneToday)
+            return (
+              <PlayerRow key={item.username + index}>
+                <Text primary>{item.username}</Text>
+                <Text primary style={{backgroundColor: checked}}>{item.doneToday}</Text>                
+                <Text primary>{item.total}</Text>                
+              </PlayerRow>
+            );
+          }}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={1}
+        />
         <Header>
           <Text title>{groupName}</Text>
+        </Header>
+        <Header>
+          <Text large>{} days left</Text>
         </Header>
         <Divider />
         <Info>
@@ -29,17 +62,33 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
         <Players>
           <Text primary large>
             Players
-          </Text>          
+          </Text>
+          {/* <Table borderStyle={{borderWidth: 20, borderColor: '#c8e1ff'}}>
+            <Row data={['Name', 'Daily Check', 'Total']} style={tableStyles.head} textStyle={tableStyles.text}/>
+            <Rows textStyle={tableStyles.text} data={userResults} />
+          </Table>  */}
         </Players>
-        <Footer>
-          <Button
-            onPress={() => {
-              navigation.navigate('NAME OF BRIANNAS COMPONENT');
-            }}
-          >
-            <Text large>EDIT GROUP</Text>
-          </Button>
-        </Footer>
+        <View>
+          <Buttons>
+            <Button
+              onPress={() => {
+                navigation.navigate('NAME OF BRIANNAS COMPONENT');
+              }}
+              style={{ backgroundColor: 'lightgreen' }}
+            >
+              <Text large>COMPLETE FOR TODAY</Text>
+            </Button>
+          </Buttons>
+          <Buttons>
+            <Button
+              onPress={() => {
+                navigation.navigate('NAME OF BRIANNAS COMPONENT');
+              }}
+            >
+              <Text small>EDIT GROUP</Text>
+            </Button>
+          </Buttons>
+        </View>
       </Container>
     </SafeAreaView>
   );
@@ -51,6 +100,14 @@ const Container = styled.View`
   justify-content: center;
   padding: 0 5%;
   margin-bottom: 20px;
+`;
+
+const PlayerRow = styled.View`
+  flex-direction: row;
+  background-color: red;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
 `;
 
 const Header = styled.View`
@@ -74,17 +131,15 @@ const InfoBox = styled.View`
   padding: 5px 50px;
 `;
 
-
 const Players = styled.View`
   flex: 4;
-  align-items: center;
   background-color: slategray;
   margin: 20px 0;
   padding-top: 10px;
   border-radius: 15px;
 `;
 
-const Footer = styled.View`
+const Buttons = styled.View`
   flex-direction: row;
   justify-content: center;
 `;
@@ -115,8 +170,9 @@ const Button = styled.TouchableOpacity`
   justify-content: center;
   width: 90%;
   padding: 8px;
-  background-color: lightpink;
+  background-color: lightskyblue;
   border-radius: 10px;
+  margin: 5px 0;
 `;
 
 export default GroupDashboard;

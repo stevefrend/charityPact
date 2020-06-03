@@ -3,6 +3,8 @@ import { SafeAreaView, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
+
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
 
@@ -127,6 +129,7 @@ const Button = styled.TouchableOpacity`
   padding: 8px;
   background-color: lightpink;
   border-radius: 10px;
+  margin-bottom: 10px;
 `;
 
 export default Home;

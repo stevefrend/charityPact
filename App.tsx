@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './views/home/Home';
 import GroupDashboard from './views/group-dashboard/GroupDashboard';
+import Test from './views/Test';
 
 const Stack = createStackNavigator();
 
@@ -11,6 +12,7 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Home'>
+        {/* <Stack.Screen name='Test' component={Test} /> */}
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='GroupDashboard' component={GroupDashboard} />
       </Stack.Navigator>
