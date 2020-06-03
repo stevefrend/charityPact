@@ -1,30 +1,43 @@
 import * as React from 'react';
-import { SafeAreaView, View, StyleSheet, FlatList } from 'react-native';
+import { SafeAreaView, View, StyleSheet, FlatList, Modal } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-
-const tableStyles = StyleSheet.create({
-  container: { padding: 16, paddingTop: 30, backgroundColor: '#fff' },
-  head: { backgroundColor: '#f1f8ff' },
-  text: { margin: 6 },
-});
 
 const dummyUsers = [
   { username: 'Jae', doneToday: 'false', total: 15 },
   { username: 'Charlie', doneToday: 'false', total: 7 },
   { username: 'Brianna', doneToday: 'true', total: 20 },
-  { username: 'Steve', doneToday: 'true', total: 5 },
+  { username: 'Steve', doneToday: 'false', total: 5 },
 ];
 
 const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
   const { groupName } = route.params;
+  const [modalVisible, setModalVisible] = React.useState(true);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Container>
+        <Modal
+          animationType='fade'
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            // Alert.alert('Modal has been closed.');
+          }}
+        >
+          <ModalView>
+            <ModalBox>
+              <Text title>Good job!</Text>
+              <Text title style={{fontSize: 80}}>🎉</Text>            
+              <Text small>You have completed the task for today</Text>
+              <ModalButton onPress={() => setModalVisible(false)}>
+                <Text>Close me</Text>
+              </ModalButton>
+            </ModalBox>
+          </ModalView>
+        </Modal>
         <Header>
           <Text title>{groupName}</Text>
         </Header>
@@ -44,16 +57,32 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
           </InfoBox>
         </Info>
         <Players>
-          <Text large style={{ marginLeft: 142 }}>
+          <Text title style={{ marginLeft: 142 }}>
             Players
           </Text>
 
           <FlatList
             data={dummyUsers}
+            ListHeaderComponent={
+              <View style={{ marginBottom: 10 }}>
+                <PlayerRow>
+                  <PlayerCell primary style={{ fontWeight: 'bold' }}>
+                    Name
+                  </PlayerCell>
+                  <PlayerCell primary style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                    Done
+                  </PlayerCell>
+                  <PlayerCell primary style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                    Total
+                  </PlayerCell>
+                </PlayerRow>
+                <Divider primary />
+              </View>
+            }
             renderItem={({ item, index }): any => {
               const checked =
                 item.doneToday === 'true' ? (
-                  <AntDesign name='checkcircleo' size={24} color='green' />
+                  <AntDesign name='checkcircleo' size={22} color='green' />
                 ) : (
                   <MaterialIcons name='radio-button-unchecked' size={24} color='red' />
                 );
@@ -71,27 +100,14 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
             }}
             keyExtractor={(item, index) => index.toString()}
             numColumns={1}
-            ListHeaderComponent={
-              <View style={{ marginBottom: 10 }}>
-                <PlayerRow>
-                  <PlayerCell primary>Name</PlayerCell>
-                  <PlayerCell primary style={{ textAlign: 'center' }}>
-                    Done
-                  </PlayerCell>
-                  <PlayerCell primary style={{ textAlign: 'center' }}>
-                    Total
-                  </PlayerCell>
-                </PlayerRow>
-                <Divider primary />
-              </View>
-            }
           />
         </Players>
         <View>
           <Buttons>
             <Button
               onPress={() => {
-                navigation.navigate('NAME OF BRIANNAS COMPONENT');
+                setModalVisible(true);
+                // change user state to complete by triggering mutation to update DB, then re-render component and changes should be there
               }}
               style={{ backgroundColor: 'lightgreen' }}
             >
@@ -210,6 +226,30 @@ const Button = styled.TouchableOpacity`
   background-color: lightskyblue;
   border-radius: 10px;
   margin: 5px 0;
+`;
+
+
+const ModalView = styled.View`
+  flex: 1;
+  background-color: #000000aa;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ModalBox = styled.View`
+  height: 300px;
+  background-color: white;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  border-radius: 10px;
+`;
+
+const ModalButton = styled.TouchableOpacity`
+  padding: 8px 50px;
+  margin-top: 30px;
+  background-color: lightskyblue;
+  border-radius: 5px;
 `;
 
 export default GroupDashboard;
