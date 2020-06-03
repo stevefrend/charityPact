@@ -14,7 +14,7 @@ const dummyUsers = [
 
 const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
   const { groupName } = route.params;
-  const [modalVisible, setModalVisible] = React.useState(true);
+  const [modalVisible, setModalVisible] = React.useState(false);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -31,9 +31,9 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
             <ModalBox>
               <Text title>Good job!</Text>
               <Text title style={{fontSize: 80}}>🎉</Text>            
-              <Text small>You have completed the task for today</Text>
+              <Text small>You have completed today's task</Text>
               <ModalButton onPress={() => setModalVisible(false)}>
-                <Text>Close me</Text>
+                <Text>Close</Text>
               </ModalButton>
             </ModalBox>
           </ModalView>
@@ -234,14 +234,17 @@ const ModalView = styled.View`
   background-color: #000000aa;
   justify-content: center;
   align-items: center;
+
+  
 `;
 
 const ModalBox = styled.View`
-  height: 300px;
+  height: 400px;
   background-color: white;
   justify-content: space-between;
   align-items: center;
   padding: 30px;
+  margin: 10px;
   border-radius: 10px;
 `;
 
