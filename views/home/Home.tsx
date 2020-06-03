@@ -6,9 +6,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
 
 // Flesh this out later
-interface Props {
-  navigation: Object;
-}
+// interface Props {
+//   navigation: Object;
+// }
+
 const mockGroups = [
   {
     groupName: 'Coworkers',
@@ -24,8 +25,13 @@ const mockGroups = [
     deadline: Date.now(),
     users: ['Jae', 'Steve', 'Charlie'],
   },
-  { groupName: 'Family', amount: 1000, goalName: 'Floss', deadline: Date.now(), users: ['Charlie', 'Steve'] },
-  { groupName: 'Family', goalName: 'Floss', deadline: Date.now(), users: ['Charlie', 'Steve'] },
+  {
+    groupName: 'Family',
+    amount: 1000,
+    goalName: 'Floss',
+    deadline: Date.now(),
+    users: ['Charlie', 'Steve'],
+  },
 ];
 
 const Home: React.FC<any> = ({ navigation }) => {
@@ -98,7 +104,7 @@ const Footer = styled.View`
 `;
 
 const Text = styled.Text`
-  color: ${(props) => (props.primary ? 'violet' : 'white')};
+  color: ${(props: any) => (props.primary ? 'violet' : 'white')};
   font-family: 'AvenirNext-Regular';
   ${({ title, small, large }) => {
     switch (true) {
