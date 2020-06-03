@@ -2,9 +2,6 @@ import * as React from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
-
-
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
 
@@ -12,7 +9,6 @@ import styled from 'styled-components/native';
 interface Props {
   navigation: Object;
 }
-
 const mockGroups = [
   {
     groupName: 'Coworkers',
@@ -29,6 +25,7 @@ const mockGroups = [
     users: ['Jae', 'Steve', 'Charlie'],
   },
   { groupName: 'Family', amount: 1000, goalName: 'Floss', deadline: Date.now(), users: ['Charlie', 'Steve'] },
+  { groupName: 'Family', goalName: 'Floss', deadline: Date.now(), users: ['Charlie', 'Steve'] },
 ];
 
 const Home: React.FC<any> = ({ navigation }) => {
@@ -63,7 +60,7 @@ const Home: React.FC<any> = ({ navigation }) => {
         <Footer>
           <Button
             onPress={() => {
-              navigation.navigate('NAME OF BRIANNAS COMPONENT');
+              navigation.navigate('Setup');
             }}
           >
             <Text large>ADD GROUP</Text>
@@ -95,7 +92,6 @@ const Groups = styled.View`
   padding-top: 10px;
   border-radius: 15px;
 `;
-
 const Footer = styled.View`
   flex-direction: row;
   justify-content: center;
@@ -104,7 +100,6 @@ const Footer = styled.View`
 const Text = styled.Text`
   color: ${(props) => (props.primary ? 'violet' : 'white')};
   font-family: 'AvenirNext-Regular';
-
   ${({ title, small, large }) => {
     switch (true) {
       case title:
