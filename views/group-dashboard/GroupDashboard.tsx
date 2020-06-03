@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
-// import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 
 const tableStyles = StyleSheet.create({
   container: { padding: 16, paddingTop: 30, backgroundColor: '#fff' },
@@ -16,6 +16,7 @@ const dummyUsers = [
   { username: 'Jae', doneToday: 'false', total: 15 },
   { username: 'Charlie', doneToday: 'false', total: 7 },
   { username: 'Brianna', doneToday: 'true', total: 20 },
+  { username: 'Steve', doneToday: 'true', total: 5 },
 ];
 
 const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
@@ -24,23 +25,6 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Container>
-        <FlatList
-          data={dummyUsers}
-          renderItem={({ item, index }): any => {
-            
-            const checked = item.doneToday === "true" ? "green" : "red";
-            console.log(checked, item.doneToday)
-            return (
-              <PlayerRow key={item.username + index}>
-                <Text primary>{item.username}</Text>
-                <Text primary style={{backgroundColor: checked}}>{item.doneToday}</Text>                
-                <Text primary>{item.total}</Text>                
-              </PlayerRow>
-            );
-          }}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={1}
-        />
         <Header>
           <Text title>{groupName}</Text>
         </Header>
@@ -60,13 +44,48 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
           </InfoBox>
         </Info>
         <Players>
-          <Text primary large>
+          <Text large style={{ marginLeft: 142 }}>
             Players
           </Text>
-          {/* <Table borderStyle={{borderWidth: 20, borderColor: '#c8e1ff'}}>
-            <Row data={['Name', 'Daily Check', 'Total']} style={tableStyles.head} textStyle={tableStyles.text}/>
-            <Rows textStyle={tableStyles.text} data={userResults} />
-          </Table>  */}
+
+          <FlatList
+            data={dummyUsers}
+            renderItem={({ item, index }): any => {
+              const checked =
+                item.doneToday === 'true' ? (
+                  <AntDesign name='checkcircleo' size={24} color='green' />
+                ) : (
+                  <MaterialIcons name='radio-button-unchecked' size={24} color='red' />
+                );
+              return (
+                <PlayerRow key={item.username + index}>
+                  <PlayerCell primary>{item.username}</PlayerCell>
+                  <PlayerCell primary style={{ textAlign: 'center' }}>
+                    {checked}
+                  </PlayerCell>
+                  <PlayerCell primary style={{ textAlign: 'center' }}>
+                    {item.total}
+                  </PlayerCell>
+                </PlayerRow>
+              );
+            }}
+            keyExtractor={(item, index) => index.toString()}
+            numColumns={1}
+            ListHeaderComponent={
+              <View style={{ marginBottom: 10 }}>
+                <PlayerRow>
+                  <PlayerCell primary>Name</PlayerCell>
+                  <PlayerCell primary style={{ textAlign: 'center' }}>
+                    Done
+                  </PlayerCell>
+                  <PlayerCell primary style={{ textAlign: 'center' }}>
+                    Total
+                  </PlayerCell>
+                </PlayerRow>
+                <Divider primary />
+              </View>
+            }
+          />
         </Players>
         <View>
           <Buttons>
@@ -102,14 +121,6 @@ const Container = styled.View`
   margin-bottom: 20px;
 `;
 
-const PlayerRow = styled.View`
-  flex-direction: row;
-  background-color: red;
-  align-items: center;
-  justify-content: center;
-  height: 100px;
-`;
-
 const Header = styled.View`
   flex-direction: row;
   justify-content: center;
@@ -133,10 +144,36 @@ const InfoBox = styled.View`
 
 const Players = styled.View`
   flex: 4;
-  background-color: slategray;
+  /* background-color: slategray; */
   margin: 20px 0;
   padding-top: 10px;
   border-radius: 15px;
+`;
+
+const PlayerRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  padding: 0 10px;
+  justify-content: space-evenly;
+  height: 30px;
+`;
+
+const PlayerCell = styled.Text`
+  color: black;
+  font-family: 'AvenirNext-Regular';
+  width: 33%;
+  /* background-color: black; */
+  padding: 5px;
+  ${({ title, small, large }) => {
+    switch (true) {
+      case title:
+        return 'font-size: 32px';
+      case large:
+        return 'font-size: 26px';
+      case small:
+        return 'font-size: 20px';
+    }
+  }}
 `;
 
 const Buttons = styled.View`
