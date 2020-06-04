@@ -33,29 +33,28 @@ const mockGroups = [
 ];
 
 const Home: React.FC<any> = ({ navigation }) => {
-  // const { data, loading, error } = useQuery(queries.GET_GROUPS, { variables: { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e'}})
-  // console.log(data, loading, error)
+  const { data, loading, error } = useQuery(queries.GET_GROUPS, { variables: { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e'}})
+  console.log(data, loading, error)
 
-  if (false) {
-    // change later to loading
+  if (loading) {    
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, alignItems: "center" }}>
         <ActivityIndicator size='large' color='#0000ff' />
       </SafeAreaView>
     );
   } else {
-    // const buttons = data.getGroups.map((group, index) => {
-    //   return (
-    //     <Button
-    //       onPress={() => {
-    //         navigation.navigate('GroupDashboard', { groupName: group.groupId });
-    //       }}
-    //       key={index + group.groupName}
-    //     >
-    //       <Text small>{group.groupName}</Text>
-    //     </Button>
-    //   );
-    // });
+    const buttons = data.getGroups.map((group: any, index: any) => {
+      return (
+        <Button
+          onPress={() => {
+            navigation.navigate('GroupDashboard', { groupName: group.id });
+          }}
+          key={index + group.groupName}
+        >
+          <Text small>{group.groupName}</Text>
+        </Button>
+      );
+    });
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <Container>

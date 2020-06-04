@@ -28,9 +28,9 @@ const calculateTimeLeft = (date: any) => {
 }
 
 const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
-  const { groupId } = route.params;
+  const { id } = route.params;
   //! Send QUERY here with groupID, which should populate groupInformation (below), which is our local state for the current group
-  const { data, loading, error } = useQuery(queries.GET_GROUP, { variables: { groupId }})
+  const { data, loading, error } = useQuery(queries.GET_GROUP, { variables: { id }})
   const [groupInformation, setGroupInformation] = React.useState({
     groupName: '',
     amount: 0,
