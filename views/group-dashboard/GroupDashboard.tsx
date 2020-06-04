@@ -1,28 +1,16 @@
 import * as React from 'react';
-import {
-  SafeAreaView,
-  View,
-  StyleSheet,
-  FlatList,
-  Modal,
-  Button as RButton,
-  TextInput,
-  ActivityIndicator,
-} from 'react-native';
+import { SafeAreaView, View, FlatList, Modal, ActivityIndicator } from 'react-native';
 import styled from 'styled-components/native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { queries } from '../../Queries';
 
-// let firstRendered = false;
-
 const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
   const { groupId, userId } = route.params;
   // GRAPHQL QUERIES
-  const { data, loading, error } = useQuery(queries.GET_GROUP, { variables: { groupId } });
-  
-  const [ completeTask, { data: updatedGroup} ] = useMutation(queries.COMPLETE_TASK, { variables: { groupId } });
+  const { data, loading, error, refetch } = useQuery(queries.GET_GROUP, { variables: { groupId } });
+  const [completeTask, { data: updatedGroup }] = useMutation(queries.COMPLETE_TASK);
   // LOCAL STATES
   const [completeModalVisible, setCompleteModalVisible] = React.useState(false);
   const [editModalVisible, setEditModalVisible] = React.useState(false);
@@ -35,14 +23,13 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
     deadline: undefined,
     members: [],
   });
-  if (loading) {    
+  if (loading) {
     return (
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
         <ActivityIndicator size='large' color='#0000ff' />
       </SafeAreaView>
     );
   } else if (!loading && data) {
-    console.log(data)
     if (!flag) {
       setGroupInformation((previousState) => {
         return {
@@ -50,7 +37,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
           ...data.getIndividualGroup,
         };
       });
-      setFlag(true)
+      setFlag(true);
     }
 
     const calculateTimeLeft = (date: any) => {
@@ -63,14 +50,13 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
     navigation.setOptions({
       headerTitle: groupInformation.groupName,
       headerRight: () => (
-        <Button
-          style={{ marginRight: 20 }}
+        <EditButton
           onPress={() => {
             setEditModalVisible(true);
           }}
         >
-          <Text>Edit</Text>
-        </Button>
+          <Text style={{color: "dodgerblue"}}>Edit</Text>
+        </EditButton>
       ),
     });
     return (
@@ -84,16 +70,18 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
                   🎉
                 </Text>
                 <Text small>You have completed today's task</Text>
-                <ModalButton onPress={() => {
-                  setCompleteModalVisible(false)
-                  console.log(updatedGroup)
-                  setGroupInformation((previousState) => {
-                    return {
-                      ...previousState,
-                      ...updatedGroup.completeTask,
-                    };
-                  });
-                  }}>
+                <ModalButton
+                  onPress={() => {
+                    setCompleteModalVisible(false);
+                    // setGroupInformation((previousState) => {
+                    //   return {
+                    //     ...previousState,
+                    //     ...updatedGroup.completeTask,
+                    //   };
+                    // });
+                    navigation.navigate('Home');
+                  }}
+                >
                   <Text>Close</Text>
                 </ModalButton>
               </ModalBox>
@@ -104,14 +92,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
               <ModalBox style={{ height: 600 }}>
                 <Text title>Edit</Text>
                 <Formik
-                  initialValues={{
-                    groupName: groupInformation.groupName,
-                    amount: groupInformation.amount,
-                    goalName: groupInformation.goalName,
-                    charityLink: groupInformation.charityLink,
-                    deadline: groupInformation.deadline,
-                    members: groupInformation.members,
-                  }}
+                  initialValues={groupInformation}
                   onSubmit={(values) => {
                     setGroupInformation((prevState) => {
                       return {
@@ -164,11 +145,19 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
                           value={formikProps.values.deadline!}
                         />
                       </InputGroup>
-                      <ModalButton style={{backgroundColor: "lightgreen"}} onPress={formikProps.handleSubmit}>
+                      <ModalButton
+                        style={{ backgroundColor: 'lightgreen' }}
+                        onPress={formikProps.handleSubmit}
+                      >
                         <Text large>Submit</Text>
                       </ModalButton>
-                      <ModalButton style={{backgroundColor: "crimson"}} onPress={() => setEditModalVisible(false)}>
-                        <Text small style={{color: "white"}}>Discard</Text>
+                      <ModalButton
+                        style={{ backgroundColor: 'crimson' }}
+                        onPress={() => setEditModalVisible(false)}
+                      >
+                        <Text small style={{ color: 'white' }}>
+                          Discard
+                        </Text>
                       </ModalButton>
                     </View>
                   )}
@@ -177,7 +166,8 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
             </ModalView>
           </Modal>
           <Header>
-            <Text large>{calculateTimeLeft(groupInformation.deadline)}</Text>
+            <Text title>{groupInformation.goalName.toUpperCase()}</Text>
+            <Text small>{calculateTimeLeft(groupInformation.deadline)}</Text>
           </Header>
           <Divider />
           <Info>
@@ -240,12 +230,11 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
           <View>
             <Buttons>
               <Button
-                onPress={() => {
-                  completeTask({ variables: { groupId, userId}})
+                onPress={async () => {
                   setCompleteModalVisible(true);
-                  //! change user state to complete by triggering mutation to update DB, then re-render component and changes should be there
+                  await completeTask({ variables: { groupId, userId } });
                 }}
-                style={{ backgroundColor: 'lightgreen' }}
+                style={{ backgroundColor: 'lightpink' }}
               >
                 <Text large>COMPLETE FOR TODAY</Text>
               </Button>
@@ -266,13 +255,14 @@ const Container = styled.View`
 `;
 
 const Header = styled.View`
-  flex-direction: row;
+  margin-top: 20px;
   justify-content: center;
+  align-items: center;
 `;
 
 const Info = styled.View`
   flex: 1;
-  background-color: lightgray;
+  /* background-color: lightgray; */
   margin: 20px 0;
 `;
 
@@ -281,8 +271,10 @@ const InfoBox = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  background-color: lightblue;
+  background-color: ivory;
   padding: 5px 50px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
 `;
 
 const Players = styled.View`
@@ -339,7 +331,7 @@ const Text = styled.Text`
 `;
 
 const Divider = styled.View`
-  border-bottom-color: ${(props: any) => (props.primary ? 'black' : 'white')};
+  border-bottom-color: ${(props: any) => (props.primary ? 'darkgray' : 'white')};
   border-bottom-width: 2px;
 `;
 
@@ -351,6 +343,17 @@ const Button = styled.TouchableOpacity`
   background-color: lightskyblue;
   border-radius: 10px;
   margin: 5px 0;
+`;
+
+const EditButton = styled.TouchableOpacity`
+  flex-direction: row;
+  justify-content: center;
+  width: 90%;
+  padding: 3px 10px;
+  border: 1px solid dodgerblue;
+  border-radius: 5px;
+  margin: 5px 0;
+  margin-right: 15px;
 `;
 
 const ModalView = styled.View`
