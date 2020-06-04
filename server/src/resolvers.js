@@ -28,11 +28,10 @@ module.exports = {
         return null;
       }
     },
-    getGroups: async (_, { userId }, data) => {
-      console.log(data)
+    getGroups: async (_, { userId }, context) => {
       const groups = await databaseAPI.getGroups({ userId });
       const groupIds = [];
-      groups.forEach((group) => groupIds.push([group.id]));
+      groups.forEach((group) => groupIds.push(group.id));
       const members = await databaseAPI.getMembers(groupIds);
       const combinedGroups = combineGroups(groups, members)
       return combinedGroups;
