@@ -38,8 +38,6 @@ module.exports = {
       groups.forEach((group) => groupIds.push([group.id]));
 
       const members = await databaseAPI.getMembers(groupIds);
-
-      console.log(members);
       if (groups) {
         return {
           id: groups.id,

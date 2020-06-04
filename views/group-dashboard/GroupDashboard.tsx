@@ -11,6 +11,8 @@ import {
 import styled from 'styled-components/native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
+import { useQuery } from '@apollo/react-hooks';
+import { queries } from '../../Queries';
 
 const dummyUsers = [
   { username: 'Jae', doneToday: 'false', total: 15 },
@@ -26,201 +28,212 @@ const calculateTimeLeft = (date: any) => {
 }
 
 const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
-  const { groupName } = route.params;
+  const { groupId } = route.params;
   //! Send QUERY here with groupID, which should populate groupInformation (below), which is our local state for the current group
+  const { data, loading, error } = useQuery(queries.GET_GROUP, { variables: { groupId }})
   const [groupInformation, setGroupInformation] = React.useState({
-    groupName: 'Coworkers',
-    amount: 150,
-    goalName: 'Meditate',
-    charity: 'Red Cross',
-    deadline: new Date('2020-06-06T03:04:05.678Z'),
-    users: ['Jae', 'Steve', 'Charlie', 'Brianna'],
+    groupName: '',
+    amount: 0,
+    goalName: '',
+    charity: '',
+    deadline: undefined,
+    users: [],
   });
-  // console.log(groupInformation);
   const [completeModalVisible, setCompleteModalVisible] = React.useState(false);
-  const [editModalVisible, setEditModalVisible] = React.useState(false);  
-
-  navigation.setOptions({
-    headerTitle: groupName,
-    headerRight: () => (
-      <Button
-        style={{ marginRight: 20 }}
-        onPress={() => {
-          setEditModalVisible(true);
-        }}
-      >
-        <Text>Edit</Text>
-      </Button>
-    ),
-  });
-
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Container>
-        <Modal animationType='fade' transparent={true} visible={completeModalVisible}>
-          <ModalView>
-            <ModalBox>
-              <Text title>Good job!</Text>
-              <Text title style={{ fontSize: 80 }}>
-                🎉
-              </Text>
-              <Text small>You have completed today's task</Text>
-              <ModalButton onPress={() => setCompleteModalVisible(false)}>
-                <Text>Close</Text>
-              </ModalButton>
-            </ModalBox>
-          </ModalView>
-        </Modal>
-        <Modal animationType='fade' transparent={true} visible={editModalVisible}>
-          <ModalView>
-            <ModalBox>
-              <Text title>Edit</Text>
-              <Formik
-                initialValues={{
-                  groupName: groupInformation.groupName,
-                  amount: groupInformation.amount,
-                  goalName: groupInformation.goalName,
-                  charity: groupInformation.charity,
-                  deadline: groupInformation.deadline,
-                  users: groupInformation.users,
-                }}
-                onSubmit={(values) => {
-                  setGroupInformation((prevState) => {
-                    return {
-                      ...prevState,
-                      ...values,
-                    };
-                  });
-                  //! NEED TO TRIGGER MUTATION TO DATABASE HERE TO UPDATE CURRENT GROUP
-                  setEditModalVisible(false);
-                }}
-              >
-                {(formikProps) => (
-                  <View style={{ backgroundColor: 'pink' }}>
-                    <InputGroup>
-                      <Text>Name:</Text>
-                      <InputStyled
-                        onChangeText={formikProps.handleChange('groupName')}
-                        value={formikProps.values.groupName}
-                      />
-                    </InputGroup>
-                    <InputGroup>
-                      <Text>Goal:</Text>
-                      <InputStyled
-                        onChangeText={formikProps.handleChange('goalName')}
-                        value={formikProps.values.goalName}
-                      />
-                    </InputGroup>
-                    <InputGroup>
-                      <Text>Donation:</Text>
-                      <InputStyled
-                        onChangeText={formikProps.handleChange('amount')}
-                        value={formikProps.values.amount.toString()}
-                      />
-                    </InputGroup>
-                    <InputGroup>
-                      <Text>Charity:</Text>
-                      <InputStyled
-                        onChangeText={formikProps.handleChange('charity')}
-                        value={formikProps.values.charity}
-                      />
-                    </InputGroup>
-                    <InputGroup>
-                      <Text>Deadline:</Text>
-                      <InputStyled
-                        onChangeText={formikProps.handleChange('deadline')}
-                        value={formikProps.values.deadline.toString()}
-                      />
-                    </InputGroup>
-                    <ModalButton onPress={formikProps.handleSubmit}>
-                      <Text>Submit</Text>
-                    </ModalButton>
-                  </View>
-                )}
-              </Formik>
-              <ModalButton onPress={() => setEditModalVisible(false)}>
-                <Text>Discard</Text>
-              </ModalButton>
-            </ModalBox>
-          </ModalView>
-        </Modal>
-        <Header>
-          <Text large>{calculateTimeLeft(groupInformation.deadline)} days left</Text>
-        </Header>
-        <Divider />
-        <Info>
-          <InfoBox>
-            <Text small>Stake:</Text>
-            <Text small>{groupInformation.amount}</Text>
-          </InfoBox>
-          <Divider primary />
-          <InfoBox>
-            <Text small>Charity:</Text>
-            <Text small>{groupInformation.charity}</Text>
-          </InfoBox>
-        </Info>
-        <Players>
-          <Text title style={{ marginLeft: 142 }}>
-            Players
-          </Text>
-
-          <FlatList
-            data={dummyUsers}
-            ListHeaderComponent={
-              <View style={{ marginBottom: 10 }}>
-                <PlayerRow>
-                  <PlayerCell primary style={{ fontWeight: 'bold' }}>
-                    Name
-                  </PlayerCell>
-                  <PlayerCell primary style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                    Done
-                  </PlayerCell>
-                  <PlayerCell primary style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                    Total
-                  </PlayerCell>
-                </PlayerRow>
-                <Divider primary />
-              </View>
-            }
-            renderItem={({ item, index }): any => {
-              const checked =
-                item.doneToday === 'true' ? (
-                  <AntDesign name='checkcircleo' size={22} color='green' />
-                ) : (
-                  <MaterialIcons name='radio-button-unchecked' size={24} color='red' />
+  const [editModalVisible, setEditModalVisible] = React.useState(false); 
+  
+  if (!loading && data) {
+    setGroupInformation(previousState => {
+      return {
+        ...previousState,
+        ...data.getGroup
+      }
+    })
+    // console.log(groupInformation);
+     
+  
+    navigation.setOptions({
+      headerTitle: groupInformation.groupName,
+      headerRight: () => (
+        <Button
+          style={{ marginRight: 20 }}
+          onPress={() => {
+            setEditModalVisible(true);
+          }}
+        >
+          <Text>Edit</Text>
+        </Button>
+      ),
+    });
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <Container>
+          <Modal animationType='fade' transparent={true} visible={completeModalVisible}>
+            <ModalView>
+              <ModalBox>
+                <Text title>Good job!</Text>
+                <Text title style={{ fontSize: 80 }}>
+                  🎉
+                </Text>
+                <Text small>You have completed today's task</Text>
+                <ModalButton onPress={() => setCompleteModalVisible(false)}>
+                  <Text>Close</Text>
+                </ModalButton>
+              </ModalBox>
+            </ModalView>
+          </Modal>
+          <Modal animationType='fade' transparent={true} visible={editModalVisible}>
+            <ModalView>
+              <ModalBox>
+                <Text title>Edit</Text>
+                <Formik
+                  initialValues={{
+                    groupName: groupInformation.groupName,
+                    amount: groupInformation.amount,
+                    goalName: groupInformation.goalName,
+                    charity: groupInformation.charity,
+                    deadline: groupInformation.deadline,
+                    users: groupInformation.users,
+                  }}
+                  onSubmit={(values) => {
+                    setGroupInformation((prevState) => {
+                      return {
+                        ...prevState,
+                        ...values,
+                      };
+                    });
+                    //! NEED TO TRIGGER MUTATION TO DATABASE HERE TO UPDATE CURRENT GROUP
+                    setEditModalVisible(false);
+                  }}
+                >
+                  {(formikProps) => (
+                    <View style={{ backgroundColor: 'pink' }}>
+                      <InputGroup>
+                        <Text>Name:</Text>
+                        <InputStyled
+                          onChangeText={formikProps.handleChange('groupName')}
+                          value={formikProps.values.groupName}
+                        />
+                      </InputGroup>
+                      <InputGroup>
+                        <Text>Goal:</Text>
+                        <InputStyled
+                          onChangeText={formikProps.handleChange('goalName')}
+                          value={formikProps.values.goalName}
+                        />
+                      </InputGroup>
+                      <InputGroup>
+                        <Text>Donation:</Text>
+                        <InputStyled
+                          onChangeText={formikProps.handleChange('amount')}
+                          value={formikProps.values.amount.toString()}
+                        />
+                      </InputGroup>
+                      <InputGroup>
+                        <Text>Charity:</Text>
+                        <InputStyled
+                          onChangeText={formikProps.handleChange('charity')}
+                          value={formikProps.values.charity}
+                        />
+                      </InputGroup>
+                      <InputGroup>
+                        <Text>Deadline:</Text>
+                        <InputStyled
+                          onChangeText={formikProps.handleChange('deadline')}
+                          value={formikProps.values.deadline.toString()}
+                        />
+                      </InputGroup>
+                      <ModalButton onPress={formikProps.handleSubmit}>
+                        <Text>Submit</Text>
+                      </ModalButton>
+                    </View>
+                  )}
+                </Formik>
+                <ModalButton onPress={() => setEditModalVisible(false)}>
+                  <Text>Discard</Text>
+                </ModalButton>
+              </ModalBox>
+            </ModalView>
+          </Modal>
+          <Header>
+            <Text large>{calculateTimeLeft(groupInformation.deadline)} days left</Text>
+          </Header>
+          <Divider />
+          <Info>
+            <InfoBox>
+              <Text small>Stake:</Text>
+              <Text small>{groupInformation.amount}</Text>
+            </InfoBox>
+            <Divider primary />
+            <InfoBox>
+              <Text small>Charity:</Text>
+              <Text small>{groupInformation.charity}</Text>
+            </InfoBox>
+          </Info>
+          <Players>
+            <Text title style={{ marginLeft: 142 }}>
+              Players
+            </Text>
+  
+            <FlatList
+              data={dummyUsers}
+              ListHeaderComponent={
+                <View style={{ marginBottom: 10 }}>
+                  <PlayerRow>
+                    <PlayerCell primary style={{ fontWeight: 'bold' }}>
+                      Name
+                    </PlayerCell>
+                    <PlayerCell primary style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                      Done
+                    </PlayerCell>
+                    <PlayerCell primary style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                      Total
+                    </PlayerCell>
+                  </PlayerRow>
+                  <Divider primary />
+                </View>
+              }
+              renderItem={({ item, index }): any => {
+                const checked =
+                  item.doneToday === 'true' ? (
+                    <AntDesign name='checkcircleo' size={22} color='green' />
+                  ) : (
+                    <MaterialIcons name='radio-button-unchecked' size={24} color='red' />
+                  );
+                return (
+                  <PlayerRow key={item.username + index}>
+                    <PlayerCell primary>{item.username}</PlayerCell>
+                    <PlayerCell primary style={{ textAlign: 'center' }}>
+                      {checked}
+                    </PlayerCell>
+                    <PlayerCell primary style={{ textAlign: 'center' }}>
+                      {item.total}
+                    </PlayerCell>
+                  </PlayerRow>
                 );
-              return (
-                <PlayerRow key={item.username + index}>
-                  <PlayerCell primary>{item.username}</PlayerCell>
-                  <PlayerCell primary style={{ textAlign: 'center' }}>
-                    {checked}
-                  </PlayerCell>
-                  <PlayerCell primary style={{ textAlign: 'center' }}>
-                    {item.total}
-                  </PlayerCell>
-                </PlayerRow>
-              );
-            }}
-            keyExtractor={(item, index) => index.toString()}
-            numColumns={1}
-          />
-        </Players>
-        <View>
-          <Buttons>
-            <Button
-              onPress={() => {
-                setCompleteModalVisible(true);
-                //! change user state to complete by triggering mutation to update DB, then re-render component and changes should be there
               }}
-              style={{ backgroundColor: 'lightgreen' }}
-            >
-              <Text large>COMPLETE FOR TODAY</Text>
-            </Button>
-          </Buttons>
-        </View>
-      </Container>
-    </SafeAreaView>
-  );
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={1}
+            />
+          </Players>
+          <View>
+            <Buttons>
+              <Button
+                onPress={() => {
+                  setCompleteModalVisible(true);
+                  //! change user state to complete by triggering mutation to update DB, then re-render component and changes should be there
+                }}
+                style={{ backgroundColor: 'lightgreen' }}
+              >
+                <Text large>COMPLETE FOR TODAY</Text>
+              </Button>
+            </Buttons>
+          </View>
+        </Container>
+      </SafeAreaView>
+    );
+  }
+
 };
 
 const Container = styled.View`

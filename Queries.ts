@@ -8,4 +8,16 @@ export const queries = {
       }
     }
   `,
+  GET_GROUP: gql`
+    query getIndividualGroup($groupId: ID) {
+      getIndividualGroup(groupId: $groupId) {
+        groupName
+        goalName
+        amount
+        charity
+        deadline
+        members
+      }
+    }
+  `
 };

@@ -5,13 +5,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
 import { useQuery } from '@apollo/react-hooks';
-import {queries} from '../../Queries'
-import { gql } from "apollo-boost";
-
-// Flesh this out later
-// interface Props {
-//   navigation: Object;
-// }
+import { queries } from '../../Queries';
+import { gql } from 'apollo-boost';
 
 const mockGroups = [
   {
@@ -41,53 +36,54 @@ const Home: React.FC<any> = ({ navigation }) => {
   // const { data, loading, error } = useQuery(queries.GET_GROUPS, { variables: { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e'}})
   // console.log(data, loading, error)
 
-  const buttons = mockGroups.map((group, index) => {
-    return (
-      <Button
-        onPress={() => {
-          navigation.navigate('GroupDashboard', { groupName: group.groupName });
-        }}
-        key={index + group.groupName}
-      >
-        <Text small>{group.groupName}</Text>
-      </Button>
-    );
-  });
-
-  if (false) { // change later to loading
+  if (false) {
+    // change later to loading
     return (
       <SafeAreaView style={{ flex: 1 }}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size='large' color='#0000ff' />
       </SafeAreaView>
-    )
+    );
   } else {
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Container>
-        <Header>
-          <Text primary title>
-            Welcome, Username
-          </Text>
-        </Header>
-        <Divider />
-        <Groups>
-          <Text primary large>
-            Groups
-          </Text>
-          {buttons}
-        </Groups>
-        <Footer>
-          <Button
-            onPress={() => {
-              navigation.navigate('Setup');
-            }}
-          >
-            <Text large>ADD GROUP</Text>
-          </Button>
-        </Footer>
-      </Container>
-    </SafeAreaView>
-  )};
+    // const buttons = data.getGroups.map((group, index) => {
+    //   return (
+    //     <Button
+    //       onPress={() => {
+    //         navigation.navigate('GroupDashboard', { groupName: group.groupId });
+    //       }}
+    //       key={index + group.groupName}
+    //     >
+    //       <Text small>{group.groupName}</Text>
+    //     </Button>
+    //   );
+    // });
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <Container>
+          <Header>
+            <Text primary title>
+              Welcome, Username
+            </Text>
+          </Header>
+          <Divider />
+          <Groups>
+            <Text primary large>
+              Groups
+            </Text>
+            {buttons}
+          </Groups>
+          <Footer>
+            <Button
+              onPress={() => {
+                navigation.navigate('Setup');
+              }}
+            >
+              <Text large>ADD GROUP</Text>
+            </Button>
+          </Footer>
+        </Container>
+      </SafeAreaView>
+    );
+  }
 };
 
 const Container = styled.View`
