@@ -5,6 +5,7 @@ const typeDefs = gql`
 
   # Queries
   type Query {
+    test: String!
     # validate a user on login
     validateUser(username: String!, password: String!): ValidateUserResponse!
     # get all groups that a particular user is a member of

@@ -1,9 +1,12 @@
 import * as React from 'react';
-import { SafeAreaView, StatusBar } from 'react-native';
+import { SafeAreaView, StatusBar, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
+import { useQuery } from '@apollo/react-hooks';
+import {queries} from '../../Queries'
+import { gql } from "apollo-boost";
 
 // Flesh this out later
 // interface Props {
@@ -35,6 +38,9 @@ const mockGroups = [
 ];
 
 const Home: React.FC<any> = ({ navigation }) => {
+  // const { data, loading, error } = useQuery(queries.GET_GROUPS, { variables: { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e'}})
+  // console.log(data, loading, error)
+
   const buttons = mockGroups.map((group, index) => {
     return (
       <Button
@@ -48,6 +54,13 @@ const Home: React.FC<any> = ({ navigation }) => {
     );
   });
 
+  if (false) { // change later to loading
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </SafeAreaView>
+    )
+  } else {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Container>
@@ -74,7 +87,7 @@ const Home: React.FC<any> = ({ navigation }) => {
         </Footer>
       </Container>
     </SafeAreaView>
-  );
+  )};
 };
 
 const Container = styled.View`
