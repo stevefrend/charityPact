@@ -4,30 +4,6 @@ import styled from 'styled-components/native';
 import { useQuery } from '@apollo/react-hooks';
 import { queries } from '../../Queries';
 
-const mockGroups = [
-  {
-    groupName: 'Coworkers',
-    amount: 150,
-    goalName: 'Meditate',
-    deadline: Date.now(),
-    users: ['Jae', 'Steve', 'Charlie', 'Brianna'],
-  },
-  {
-    groupName: 'Friends',
-    amount: 500,
-    goalName: 'Run a mile',
-    deadline: Date.now(),
-    users: ['Jae', 'Steve', 'Charlie'],
-  },
-  {
-    groupName: 'Family',
-    amount: 1000,
-    goalName: 'Floss',
-    deadline: Date.now(),
-    users: ['Charlie', 'Steve'],
-  },
-];
-
 const Home: React.FC<any> = ({ navigation }) => {
   const { data, loading, error } = useQuery(queries.GET_GROUPS, { variables: { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e'}})
     
@@ -54,7 +30,7 @@ const Home: React.FC<any> = ({ navigation }) => {
           </Header>
           <Divider />
           <Groups>
-          <Text primary large style={{color: "slategray"}}>
+          <Text primary large style={{color: "slategray", marginBottom: 15}}>
               Groups
             </Text>
             {buttons}

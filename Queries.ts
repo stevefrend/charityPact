@@ -47,6 +47,7 @@ export const queries = {
     mutation createGroup($group: ID!) {
       createGroup(group: $group) {
         groupName
+      }
     }
   `,
 };

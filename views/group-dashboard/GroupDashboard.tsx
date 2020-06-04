@@ -15,16 +15,18 @@ import { Formik } from 'formik';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { queries } from '../../Queries';
 
-let firstRendered = false;
+// let firstRendered = false;
 
 const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
   const { groupId, userId } = route.params;
   // GRAPHQL QUERIES
   const { data, loading, error } = useQuery(queries.GET_GROUP, { variables: { groupId } });
+  
   const [ completeTask, { data: updatedGroup} ] = useMutation(queries.COMPLETE_TASK, { variables: { groupId } });
   // LOCAL STATES
   const [completeModalVisible, setCompleteModalVisible] = React.useState(false);
   const [editModalVisible, setEditModalVisible] = React.useState(false);
+  const [flag, setFlag] = React.useState(false);
   const [groupInformation, setGroupInformation] = React.useState({
     groupName: '',
     amount: 0,
@@ -33,22 +35,22 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
     deadline: undefined,
     members: [],
   });
-  // console.log(groupInformation)
-  if (loading) {
+  if (loading) {    
     return (
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
         <ActivityIndicator size='large' color='#0000ff' />
       </SafeAreaView>
     );
   } else if (!loading && data) {
-    if (!firstRendered) {
+    console.log(data)
+    if (!flag) {
       setGroupInformation((previousState) => {
         return {
           ...previousState,
           ...data.getIndividualGroup,
         };
       });
-      firstRendered = true;
+      setFlag(true)
     }
 
     const calculateTimeLeft = (date: any) => {
@@ -378,16 +380,12 @@ const ModalButton = styled.TouchableOpacity`
 `;
 
 const InputGroup = styled.View`
-  /* flex-direction: row; */
-  /* justify-content: space-between; */
   padding: 0px 50px;
   margin: 10px 50px;
   align-items: center;
-  /* border: 1px solid black; */
 `;
 
 const InputStyled = styled.TextInput`
-  /* padding: 10px; */
   font-size: 18px;
 `;
 
