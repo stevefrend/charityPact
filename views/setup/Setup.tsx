@@ -3,11 +3,27 @@ import { SafeAreaView, View, Modal } from 'react-native';
 import { Text, TextInput, StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+import { queries } from '../../Queries';
 
-const Setup: React.FC<any> = ({ navigation }) => {
-  const [text, setText] = useState({});
+const Setup: React.FC<any> = ({ route, navigation }) => {
+  const { userId } = route.params;
+
+  const [ createGroup ] = useMutation(queries.CREATE_GROUP);
+
+  const [group, setGroup] = useState({
+    userId,
+    groupName: '',
+    goalName: '',
+    amount: '',
+    deadline: '',
+    charityLink: '',
+    members: []
+
+  });
   const [date, setDate] = useState<any>(new Date().toISOString());
   const [modalView, setModalView] = useState(false);
+
 
   function Separator() {
     return <View style={styles.separator} />;
@@ -29,25 +45,66 @@ const Setup: React.FC<any> = ({ navigation }) => {
         <TextInput
           style={{ height: 40 }}
           placeholder='Enter Group Name'
-          onChangeText={(text) => setText(text)}
+          onChangeText={(text) => {
+            setGroup(prevState => {
+              return {
+                ...prevState,
+                groupName: text
+              }
+            })
+          }}
         />
         <Separator />
         <TextInput
           style={{ height: 40 }}
           placeholder='Enter Group Goal'
-          onChangeText={(text) => setText(text)}
+          onChangeText={(text) => {
+            setGroup(prevState => {
+              return {
+                ...prevState,
+                goalName: text
+              }
+            })
+          }}
         />
         <Separator />
         <TextInput
           style={{ height: 40 }}
           placeholder='Select Charity'
-          onChangeText={(text) => setText(text)}
+          onChangeText={(text) => {
+            setGroup(prevState => {
+              return {
+                ...prevState,
+                charityLink: text
+              }
+            })
+          }}
         />
         <Separator />
         <TextInput
           style={{ height: 40 }}
           placeholder='Add Users'
-          onChangeText={(text) => setText(text)}
+          onChangeText={(text) => {
+            setGroup(prevState => {
+              return {
+                ...prevState,
+                groupName: text
+              }
+            })
+          }}
+        />
+        <Separator />
+        <TextInput
+          style={{ height: 40 }}
+          placeholder='Add Amount'
+          onChangeText={(text) => {
+            setGroup(prevState => {
+              return {
+                ...prevState,
+                amount: text
+              }
+            })
+          }}
         />
         <Separator />
         <AddDateButton onPress={() => setModalView(true)}>
@@ -58,21 +115,25 @@ const Setup: React.FC<any> = ({ navigation }) => {
             <DateTimePicker testID='dateTimePicker' value={date} mode='date' onChange={onChange}/>
             <ModalButton
               onPress={() => {
-                setText((previousState) => {
+                setGroup((previousState) => {
                   return {
                     ...previousState,
                     goalDate: date,
                   };
                 });
-                setModalView(false);
+                // setModalView(false);
               }}
             >
               <Text>Enter</Text>
             </ModalButton>
           </ModalView>
         </Modal>
-        <CreateButton>
-          {/* HERE WE NEED TO TRIGGER A MUTATION TO CREATE THE GROUP */}
+        <CreateButton onPress={() => {
+          createGroup({ variables: {
+            userId,
+            // Brianna's code has new funcitonality for this component. May have to wait for her code in order to know where to trigger this mutation and if information is already in state.
+          }})
+        }}>
           <Text style={{color: "white", fontSize: 20}}>Create Group</Text>
         </CreateButton>
       </Container>

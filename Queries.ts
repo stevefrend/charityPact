@@ -43,4 +43,10 @@ export const queries = {
       }
     }
   `,
+  CREATE_GROUP: gql`
+    mutation createGroup($group: ID!) {
+      createGroup(group: $group) {
+        groupName
+    }
+  `,
 };

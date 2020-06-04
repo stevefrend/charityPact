@@ -62,7 +62,7 @@ const Home: React.FC<any> = ({ navigation }) => {
           <Footer>
             <Button
               onPress={() => {
-                navigation.navigate('Setup');
+                navigation.navigate('Setup', { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e' });
               }}
             >
               <Text large>ADD GROUP</Text>
@@ -89,7 +89,7 @@ const Home: React.FC<any> = ({ navigation }) => {
           <Footer>
             <Button
               onPress={() => {
-                navigation.navigate('Setup');
+                navigation.navigate('Setup', { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e' });
               }}
             >
               <Text large>ADD GROUP</Text>
