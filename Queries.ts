@@ -23,7 +23,24 @@ export const queries = {
           daysCompleted
           completedToday
         }
+      }
     }
-  }
-  `
+  `,
+  COMPLETE_TASK: gql`
+    mutation completeTask($userId: ID!, $groupId: ID!) {
+      completeTask(userId: $userId, groupId: $groupId) {
+        id
+        groupName
+        goalName
+        amount
+        charityLink
+        deadline
+        members {
+          username
+          daysCompleted
+          completedToday
+        }
+      }
+    }
+  `,
 };

@@ -51,7 +51,7 @@ const Setup: React.FC<any> = ({ navigation }) => {
         />
         <Separator />
         <AddDateButton onPress={() => setModalView(true)}>
-          <Text>Set End Date</Text>
+          <Text style={{color: "lightpink", fontSize: 18}}>Set End Date</Text>
         </AddDateButton>
         <Modal animationType='slide' transparent={true} visible={modalView}>
           <ModalView>            
@@ -73,7 +73,7 @@ const Setup: React.FC<any> = ({ navigation }) => {
         </Modal>
         <CreateButton>
           {/* HERE WE NEED TO TRIGGER A MUTATION TO CREATE THE GROUP */}
-          <Text>Create Group</Text>
+          <Text style={{color: "white", fontSize: 20}}>Create Group</Text>
         </CreateButton>
       </Container>
     </SafeAreaView>
@@ -91,14 +91,15 @@ const styles = StyleSheet.create({
 const Container = styled.View`
   flex: 1;
   background-color: #fff;
-  justify-content: center;
-  padding: 0 5%;
+  /* justify-content: center; */
+  padding: 20px 5%;
   margin-bottom: 20px;
 `;
 
 const Header = styled.View`
   flex-direction: row;
   justify-content: center;
+  margin-bottom: 30px;
 `;
 
 const Title = styled.Text`
@@ -111,7 +112,6 @@ const Title = styled.Text`
 const CreateButton = styled.TouchableOpacity`
   flex-direction: row;
   justify-content: center;
-  /* width: 90%; */
   padding: 8px;
   background-color: lightpink;
   border-radius: 10px;
@@ -120,10 +120,11 @@ const CreateButton = styled.TouchableOpacity`
 const AddDateButton = styled.TouchableOpacity`
   flex-direction: row;
   justify-content: center;
-  /* width: 90%; */
+  margin-top: 30px;
   margin-bottom: 20px;
   padding: 8px;
-  background-color: lightblue;
+  background-color: azure;
+  border: 1px solid lightblue;
   border-radius: 10px;
 `;
 

@@ -30,20 +30,13 @@ const mockGroups = [
 
 const Home: React.FC<any> = ({ navigation }) => {
   const { data, loading, error } = useQuery(queries.GET_GROUPS, { variables: { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e'}})
-  console.log(data, loading, error)
-
-  if (loading) {    
-    return (
-      <SafeAreaView style={{ flex: 1, alignItems: "center" }}>
-        <ActivityIndicator size='large' color='#0000ff' />
-      </SafeAreaView>
-    );
-  } else {
+    
+  if (!loading && data){
     const buttons = data.getGroups.map((group: any, index: any) => {
       return (
         <Button
           onPress={() => {
-            navigation.navigate('GroupDashboard', { groupId: group.id });
+            navigation.navigate('GroupDashboard', { groupId: group.id, userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e' });
           }}
           key={index + group.groupName}
         >
@@ -61,7 +54,7 @@ const Home: React.FC<any> = ({ navigation }) => {
           </Header>
           <Divider />
           <Groups>
-            <Text primary large>
+          <Text primary large style={{color: "slategray"}}>
               Groups
             </Text>
             {buttons}
@@ -78,6 +71,39 @@ const Home: React.FC<any> = ({ navigation }) => {
         </Container>
       </SafeAreaView>
     );
+  } else if(!loading && data === undefined) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <Container>
+          <Header>
+            <Text primary title>
+              Welcome, Username
+            </Text>
+          </Header>
+          <Divider />
+          <Groups>
+            <Text primary large style={{color: "slategray"}}>
+              You have no groups!
+            </Text>
+          </Groups>
+          <Footer>
+            <Button
+              onPress={() => {
+                navigation.navigate('Setup');
+              }}
+            >
+              <Text large>ADD GROUP</Text>
+            </Button>
+          </Footer>
+        </Container>
+      </SafeAreaView>
+    )
+  } else {
+    return (
+      <SafeAreaView style={{ flex: 1, alignItems: "center" }}>
+        <ActivityIndicator size='large' color='#0000ff' />
+      </SafeAreaView>
+    );
   }
 };
 
@@ -85,7 +111,7 @@ const Container = styled.View`
   flex: 1;
   background-color: #fff;
   justify-content: center;
-  padding: 0 5%;
+  padding: 20px 5%;
   margin-bottom: 20px;
 `;
 
@@ -97,7 +123,6 @@ const Header = styled.View`
 const Groups = styled.View`
   flex: 1;
   align-items: center;
-  background-color: slategray;
   margin: 20px 0;
   padding-top: 10px;
   border-radius: 15px;
@@ -108,7 +133,7 @@ const Footer = styled.View`
 `;
 
 const Text = styled.Text`
-  color: ${(props: any) => (props.primary ? 'violet' : 'white')};
+  color: ${(props: any) => (props.primary ? 'lightpink' : 'white')};
   font-family: 'AvenirNext-Regular';
   ${({ title, small, large }) => {
     switch (true) {
@@ -123,7 +148,7 @@ const Text = styled.Text`
 `;
 
 const Divider = styled.View`
-  border-bottom-color: violet;
+  border-bottom-color: lightpink;
   border-bottom-width: 2px;
 `;
 
