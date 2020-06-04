@@ -3,6 +3,10 @@ const combineGroups = require('../src/utils/combineGroups');
 
 module.exports = {
   Query: {
+    test: () => {
+      console.log('hit server')
+      return 'yes'
+    },
     validateUser: async (_, { username, password }) => {
       const user = await databaseAPI.validateUser({ username, password });
       if (user) {
