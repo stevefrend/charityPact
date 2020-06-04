@@ -13,7 +13,7 @@ const typeDefs = gql`
     # get specific group data based on the passed in groupID
     getIndividualGroup(groupId: ID!): Group!
     # find a specific user
-    getUser(username: String!): User!
+    getUser(username: String!): User
   }
 
   # Mutations
@@ -23,7 +23,7 @@ const typeDefs = gql`
     # creates a group from the create group page
     createGroup(group: GroupInput): Group!
     # completes task for the current day
-    completeTask(userId: ID!, groupId: ID!): Boolean!
+    completeTask(userId: ID!, groupId: ID!): Group!
   }
 
   # Response Types

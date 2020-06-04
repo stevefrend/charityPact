@@ -3,10 +3,6 @@ const combineGroups = require('../src/utils/combineGroups');
 
 module.exports = {
   Query: {
-    test: () => {
-      console.log('hit server')
-      return 'yes'
-    },
     validateUser: async (_, { username, password }) => {
       const user = await databaseAPI.validateUser({ username, password });
       if (user) {
@@ -27,22 +23,24 @@ module.exports = {
     getUser: async (_, { username }) => {
       const user = await databaseAPI.getUser({ username });
       if (user) {
-        return {
-          id: user.id,
-          username: user.username,
-        };
+        return user;
+      } else {
+        return null;
       }
     },
-    getGroups: async (_, { userId }) => {
+    getGroups: async (_, { userId }, data) => {
+      console.log(data)
       const groups = await databaseAPI.getGroups({ userId });
       const groupIds = [];
       groups.forEach((group) => groupIds.push([group.id]));
       const members = await databaseAPI.getMembers(groupIds);
-
       const combinedGroups = combineGroups(groups, members)
-
-      console.log('combinedGroups:', combinedGroups)
-      
+      return combinedGroups;
+    },
+    getIndividualGroup: async (_, { groupId }) => {
+      const group = await databaseAPI.getIndividualGroup({ groupId });
+      const members = await databaseAPI.getMembers([groupId]);
+      const combinedGroups = combineGroups(group, members)[0]
       return combinedGroups;
     },
   },
@@ -68,12 +66,13 @@ module.exports = {
       };
     },
     completeTask: async (_, { userId, groupId }) => {
-      const user = await databaseAPI.completeTask({ userId, groupId });
+      await databaseAPI.completeTask({ userId, groupId });
       const groups = await databaseAPI.getGroups({ userId });
       const groupIds = [];
       groups.forEach((group) => groupIds.push([group.id]));
       const members = await databaseAPI.getMembers(groupIds);
-      
+      const combinedGroups = combineGroups(groups, members)[0]
+      return combinedGroups;
     },
   },
 };
