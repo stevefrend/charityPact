@@ -1,6 +1,7 @@
 const format = require('pg-format');
-const db = require('./database.js');
 const { v4: uuidv4 } = require('uuid');
+const db = require('./database.js');
+const completedToday = require('../utils/completedToday')
 
 const databaseAPI = {};
 
@@ -63,7 +64,7 @@ databaseAPI.addMembers  =  async ({group: {members}}, groupId) => {
   const today = new Date();
   members.forEach(member => {
     let uuid = uuidv4()
-    membersArray.push([uuid, member.id, member.username, groupId, 0, '1970-01-01Z00:00:00:000']);
+    membersArray.push([uuid, member.id, member.username, groupId, 0, new Date('0')]);
   })
 
   const query = format(`insert into members (id, user_id, username, group_id, days_completed, last_completed) values %L returning *;`, membersArray);
@@ -76,7 +77,7 @@ databaseAPI.addMembers  =  async ({group: {members}}, groupId) => {
       username: obj.username,
       daysCompleted: obj.days_completed,
       lastCompleted: obj.last_completed,
-      completedToday: today - obj.lastCompleted > 86400 ? false : true
+      completedToday: completedToday(today, obj.last_completed)
     }))
     return filteredMembers;
   } catch(err) {
@@ -85,7 +86,7 @@ databaseAPI.addMembers  =  async ({group: {members}}, groupId) => {
 }
 
 databaseAPI.getGroups = async ({userId}) => {
-  const query = `select groups.id, groups.group_name as "groupName", groups.amount, groups.goal_name as "goalName", groups.deadline, groups.charity_link as "charityLink" from groups join members on members.user_id = $1;`;
+  const query = `select groups.id, groups.group_name as "groupName", groups.amount, groups.goal_name as "goalName", groups.deadline, groups.charity_link as "charityLink" from groups join members on members.group_id=groups.id where members.user_id = $1;`;
   const values = [userId]
 
   try {
@@ -97,12 +98,23 @@ databaseAPI.getGroups = async ({userId}) => {
 }
 
 databaseAPI.getMembers = async (groupIds) => {
-  const query = format(`select members.user_id, members.group_id, members.user_id, members.username, members.days_completed, members.last_completed from members join groups on members.group_id = %L;`, groupIds)
   const today = new Date();
-
+  
+  const createQuery = (groupIds) => {
+    let query = 'select group_id, user_id, username, days_completed, last_completed from members where'
+    for (let i = 0; i < groupIds.length; i++) {
+      if (i === groupIds.length - 1) {
+        query += ` group_id=$${i + 1}` 
+      } else {
+        query += ` group_id=$${i + 1} or` 
+      }
+    }
+    return query;
+  }
+  const query = createQuery(groupIds)
+  
   try {
-    const res = await db.query(query)
-
+    const res = await db.query(query, groupIds)
     const filteredMembers = [];
     res.rows.forEach(obj => filteredMembers.push({
       id: obj.user_id,
@@ -110,7 +122,7 @@ databaseAPI.getMembers = async (groupIds) => {
       username: obj.username,
       daysCompleted: obj.days_completed,
       lastCompleted: obj.last_completed,
-      completedToday: today - obj.lastCompleted > 86400 ? false : true
+      completedToday: completedToday(today, obj.last_completed)
     }))
     return filteredMembers;
   } catch(err) {
@@ -124,7 +136,6 @@ databaseAPI.getIndividualGroup = async ({ groupId }) => {
 
   try {
     const res = await db.query(query, values)
-    // console.log(res.rows)
     return res.rows;
   } catch(err) {
     throw new Error(err)
