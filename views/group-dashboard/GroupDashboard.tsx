@@ -1,59 +1,162 @@
 import * as React from 'react';
-import { SafeAreaView, View, StyleSheet, FlatList, Modal } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import {
+  SafeAreaView,
+  View,
+  StyleSheet,
+  FlatList,
+  Modal,
+  Button as RButton,
+  TextInput,
+} from 'react-native';
 import styled from 'styled-components/native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { Formik } from 'formik';
 
 const dummyUsers = [
   { username: 'Jae', doneToday: 'false', total: 15 },
   { username: 'Charlie', doneToday: 'true', total: 7 },
-  { username: 'Brianna', doneToday: 'true', total: 20 },
+  { username: 'Brianna', doneToday: 'false', total: 20 },
   { username: 'Steve', doneToday: 'false', total: 5 },
 ];
 
+const calculateTimeLeft = (date: any) => {
+  const ms: number = date.getTime() - new Date().getTime();
+  const days = Math.ceil((ms / 1000) / 60 / 60 / 24)    
+  return days;
+}
+
 const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
   const { groupName } = route.params;
-  const [modalVisible, setModalVisible] = React.useState(false);
+  //! Send QUERY here with groupID, which should populate groupInformation (below), which is our local state for the current group
+  const [groupInformation, setGroupInformation] = React.useState({
+    groupName: 'Coworkers',
+    amount: 150,
+    goalName: 'Meditate',
+    charity: 'Red Cross',
+    deadline: new Date('2020-06-06T03:04:05.678Z'),
+    users: ['Jae', 'Steve', 'Charlie', 'Brianna'],
+  });
+  // console.log(groupInformation);
+  const [completeModalVisible, setCompleteModalVisible] = React.useState(false);
+  const [editModalVisible, setEditModalVisible] = React.useState(false);  
+
+  navigation.setOptions({
+    headerTitle: groupName,
+    headerRight: () => (
+      <Button
+        style={{ marginRight: 20 }}
+        onPress={() => {
+          setEditModalVisible(true);
+        }}
+      >
+        <Text>Edit</Text>
+      </Button>
+    ),
+  });
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Container>
-        <Modal
-          animationType='fade'
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            // Alert.alert('Modal has been closed.');
-          }}
-        >
+        <Modal animationType='fade' transparent={true} visible={completeModalVisible}>
           <ModalView>
             <ModalBox>
               <Text title>Good job!</Text>
-              <Text title style={{fontSize: 80}}>🎉</Text>            
+              <Text title style={{ fontSize: 80 }}>
+                🎉
+              </Text>
               <Text small>You have completed today's task</Text>
-              <ModalButton onPress={() => setModalVisible(false)}>
+              <ModalButton onPress={() => setCompleteModalVisible(false)}>
                 <Text>Close</Text>
               </ModalButton>
             </ModalBox>
           </ModalView>
         </Modal>
+        <Modal animationType='fade' transparent={true} visible={editModalVisible}>
+          <ModalView>
+            <ModalBox>
+              <Text title>Edit</Text>
+              <Formik
+                initialValues={{
+                  groupName: groupInformation.groupName,
+                  amount: groupInformation.amount,
+                  goalName: groupInformation.goalName,
+                  charity: groupInformation.charity,
+                  deadline: groupInformation.deadline,
+                  users: groupInformation.users,
+                }}
+                onSubmit={(values) => {
+                  setGroupInformation((prevState) => {
+                    return {
+                      ...prevState,
+                      ...values,
+                    };
+                  });
+                  //! NEED TO TRIGGER MUTATION TO DATABASE HERE TO UPDATE CURRENT GROUP
+                  setEditModalVisible(false);
+                }}
+              >
+                {(formikProps) => (
+                  <View style={{ backgroundColor: 'pink' }}>
+                    <InputGroup>
+                      <Text>Name:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('groupName')}
+                        value={formikProps.values.groupName}
+                      />
+                    </InputGroup>
+                    <InputGroup>
+                      <Text>Goal:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('goalName')}
+                        value={formikProps.values.goalName}
+                      />
+                    </InputGroup>
+                    <InputGroup>
+                      <Text>Donation:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('amount')}
+                        value={formikProps.values.amount.toString()}
+                      />
+                    </InputGroup>
+                    <InputGroup>
+                      <Text>Charity:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('charity')}
+                        value={formikProps.values.charity}
+                      />
+                    </InputGroup>
+                    <InputGroup>
+                      <Text>Deadline:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('deadline')}
+                        value={formikProps.values.deadline.toString()}
+                      />
+                    </InputGroup>
+                    <ModalButton onPress={formikProps.handleSubmit}>
+                      <Text>Submit</Text>
+                    </ModalButton>
+                  </View>
+                )}
+              </Formik>
+              <ModalButton onPress={() => setEditModalVisible(false)}>
+                <Text>Discard</Text>
+              </ModalButton>
+            </ModalBox>
+          </ModalView>
+        </Modal>
         <Header>
-          <Text title>{groupName}</Text>
-        </Header>
-        <Header>
-          <Text large>{} days left</Text>
+          <Text large>{calculateTimeLeft(groupInformation.deadline)} days left</Text>
         </Header>
         <Divider />
         <Info>
           <InfoBox>
             <Text small>Stake:</Text>
-            <Text small>500</Text>
+            <Text small>{groupInformation.amount}</Text>
           </InfoBox>
           <Divider primary />
           <InfoBox>
             <Text small>Charity:</Text>
-            <Text small>Red Cross</Text>
+            <Text small>{groupInformation.charity}</Text>
           </InfoBox>
         </Info>
         <Players>
@@ -106,21 +209,12 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
           <Buttons>
             <Button
               onPress={() => {
-                setModalVisible(true);
-                // change user state to complete by triggering mutation to update DB, then re-render component and changes should be there
+                setCompleteModalVisible(true);
+                //! change user state to complete by triggering mutation to update DB, then re-render component and changes should be there
               }}
               style={{ backgroundColor: 'lightgreen' }}
             >
               <Text large>COMPLETE FOR TODAY</Text>
-            </Button>
-          </Buttons>
-          <Buttons>
-            <Button
-              onPress={() => {
-                navigation.navigate('NAME OF BRIANNAS COMPONENT');
-              }}
-            >
-              <Text small>EDIT GROUP</Text>
             </Button>
           </Buttons>
         </View>
@@ -180,7 +274,7 @@ const PlayerCell = styled.Text`
   width: 33%;
   /* background-color: black; */
   padding: 5px;
-  ${({ title, small, large }) => {
+  ${({ title, small, large }: any) => {
     switch (true) {
       case title:
         return 'font-size: 32px';
@@ -198,10 +292,10 @@ const Buttons = styled.View`
 `;
 
 const Text = styled.Text`
-  color: ${(props) => (props.primary ? 'white' : 'black')};
+  color: ${(props: any) => (props.primary ? 'white' : 'black')};
   font-family: 'AvenirNext-Regular';
 
-  ${({ title, small, large }) => {
+  ${({ title, small, large }: any) => {
     switch (true) {
       case title:
         return 'font-size: 32px';
@@ -214,7 +308,7 @@ const Text = styled.Text`
 `;
 
 const Divider = styled.View`
-  border-bottom-color: ${(props) => (props.primary ? 'black' : 'white')};
+  border-bottom-color: ${(props: any) => (props.primary ? 'black' : 'white')};
   border-bottom-width: 2px;
 `;
 
@@ -228,14 +322,11 @@ const Button = styled.TouchableOpacity`
   margin: 5px 0;
 `;
 
-
 const ModalView = styled.View`
   flex: 1;
   background-color: #000000aa;
   justify-content: center;
   align-items: center;
-
-  
 `;
 
 const ModalBox = styled.View`
@@ -248,11 +339,24 @@ const ModalBox = styled.View`
   border-radius: 10px;
 `;
 
-const ModalButton = styled.TouchableOpacity`
-  padding: 8px 50px;
-  margin-top: 30px;
+const ModalButton = styled.TouchableOpacity`  
+  flex-direction: row;
+  justify-content: center;
+  padding: 8px 20px;
+  margin-top: 20px;
   background-color: lightskyblue;
   border-radius: 5px;
+`;
+
+const InputGroup = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid black;
+`;
+
+const InputStyled = styled.TextInput`
+  /* padding: 10px; */
 `;
 
 export default GroupDashboard;
