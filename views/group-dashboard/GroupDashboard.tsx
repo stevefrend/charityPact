@@ -44,7 +44,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
       const ms: number = date - new Date().getTime();
       if (ms < 0) return 'Deadline has passed';
       const days = Math.ceil(ms / 1000 / 60 / 60 / 24);
-      return `${days} left`;
+      return `${days} days left`;
     };
 
     navigation.setOptions({
@@ -73,12 +73,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
                 <ModalButton
                   onPress={() => {
                     setCompleteModalVisible(false);
-                    // setGroupInformation((previousState) => {
-                    //   return {
-                    //     ...previousState,
-                    //     ...updatedGroup.completeTask,
-                    //   };
-                    // });
+                    refetch();
                     navigation.navigate('Home');
                   }}
                 >
@@ -172,8 +167,8 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
           <Divider />
           <Info>
             <InfoBox>
-              <Text small>Stake:</Text>
-              <Text small>{groupInformation.amount}</Text>
+              <Text small>Donation:</Text>
+              <Text small>${groupInformation.amount}</Text>
             </InfoBox>
             <Divider primary />
             <InfoBox>

@@ -3,27 +3,43 @@ import { SafeAreaView, View, Modal } from 'react-native';
 import { Text, TextInput, StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { queries } from '../../Queries';
 
 const Setup: React.FC<any> = ({ route, navigation }) => {
   const { userId } = route.params;
 
   const [ createGroup ] = useMutation(queries.CREATE_GROUP);
+  const [ getUser, { data } ] = useLazyQuery(queries.GET_USER);
+  const [date, setDate] = useState<any>(new Date().toISOString());
+  const [userfield, setUserfield] = useState<any>('');
 
   const [group, setGroup] = useState({
     userId,
     groupName: '',
     goalName: '',
-    amount: '',
-    deadline: '',
+    amount: 0,
+    deadline: date,
     charityLink: '',
     members: []
 
   });
-  const [date, setDate] = useState<any>(new Date().toISOString());
   const [modalView, setModalView] = useState(false);
 
+  const updateUser = async () => {
+    await getUser({variables: { username: userfield}})
+    // if (data) {
+    //   setGroup(prevState => {
+    //     const membersCopy = prevState.members.slice();
+    //     membersCopy.push(data.getUser)
+    //     return {
+    //       ...prevState,
+    //       members: membersCopy,
+    //     }
+    //   })
+    //   setUserfield('')
+    // }
+  }
 
   function Separator() {
     return <View style={styles.separator} />;
@@ -85,14 +101,13 @@ const Setup: React.FC<any> = ({ route, navigation }) => {
           style={{ height: 40 }}
           placeholder='Add Users'
           onChangeText={(text) => {
-            setGroup(prevState => {
-              return {
-                ...prevState,
-                groupName: text
-              }
-            })
+            setUserfield(text)
           }}
+          value={userfield}
         />
+        <Button onPress={updateUser}>
+          <Text>Add</Text>
+        </Button>
         <Separator />
         <TextInput
           style={{ height: 40 }}
@@ -101,7 +116,7 @@ const Setup: React.FC<any> = ({ route, navigation }) => {
             setGroup(prevState => {
               return {
                 ...prevState,
-                amount: text
+                amount: +text
               }
             })
           }}
@@ -118,19 +133,20 @@ const Setup: React.FC<any> = ({ route, navigation }) => {
                 setGroup((previousState) => {
                   return {
                     ...previousState,
-                    goalDate: date,
+                    deadline: date,
                   };
                 });
-                // setModalView(false);
+                setModalView(false);
               }}
-            >
+              >
               <Text>Enter</Text>
             </ModalButton>
           </ModalView>
         </Modal>
         <CreateButton onPress={() => {
+          console.log(group)
           createGroup({ variables: {
-            userId,
+            group
             // Brianna's code has new funcitonality for this component. May have to wait for her code in order to know where to trigger this mutation and if information is already in state.
           }})
         }}>
@@ -202,6 +218,16 @@ const ModalButton = styled.TouchableOpacity`
   margin-top: 30px;
   background-color: lightskyblue;
   border-radius: 5px;
+`;
+
+
+const Button = styled.TouchableOpacity`
+  flex-direction: row;
+  justify-content: center;
+  padding: 8px;
+  background-color: lightskyblue;
+  border-radius: 10px;
+  margin: 5px 0;
 `;
 
 export default Setup;

@@ -44,9 +44,17 @@ export const queries = {
     }
   `,
   CREATE_GROUP: gql`
-    mutation createGroup($group: ID!) {
+    mutation createGroup($group: GroupInput) {
       createGroup(group: $group) {
         groupName
+      }
+    }
+  `,
+  GET_USER: gql`
+    query getUser($username: String!) {
+      getUser(username: $username) {
+        id
+        username
       }
     }
   `,

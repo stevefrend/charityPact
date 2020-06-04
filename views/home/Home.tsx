@@ -1,18 +1,20 @@
-import * as React from 'react';
+import React, {useState} from 'react';
+
 import { SafeAreaView, StatusBar, ActivityIndicator } from 'react-native';
 import styled from 'styled-components/native';
 import { useQuery } from '@apollo/react-hooks';
 import { queries } from '../../Queries';
 
 const Home: React.FC<any> = ({ navigation }) => {
-  const { data, loading, error } = useQuery(queries.GET_GROUPS, { variables: { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e'}})
+  const [user, setUser] = useState({ userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e', username: 'Charlie'})
+  const { data, loading, error } = useQuery(queries.GET_GROUPS, { variables: { userId: user.userId }})
     
   if (!loading && data){
     const buttons = data.getGroups.map((group: any, index: any) => {
       return (
         <Button
           onPress={() => {
-            navigation.navigate('GroupDashboard', { groupId: group.id, userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e' });
+            navigation.navigate('GroupDashboard', { groupId: group.id, userId: user.userId });
           }}
           key={index + group.groupName}
         >
@@ -25,7 +27,7 @@ const Home: React.FC<any> = ({ navigation }) => {
         <Container>
           <Header>
             <Text primary title>
-              Welcome, Username
+              Welcome, {user.username}
             </Text>
           </Header>
           <Divider />
@@ -38,7 +40,7 @@ const Home: React.FC<any> = ({ navigation }) => {
           <Footer>
             <Button
               onPress={() => {
-                navigation.navigate('Setup', { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e' });
+                navigation.navigate('Setup', { userId: user.userId });
               }}
             >
               <Text large>ADD GROUP</Text>
@@ -65,7 +67,7 @@ const Home: React.FC<any> = ({ navigation }) => {
           <Footer>
             <Button
               onPress={() => {
-                navigation.navigate('Setup', { userId: 'a0a74650-052d-49be-bffd-3a87c600cf2e' });
+                navigation.navigate('Setup', { userId: user.userId });
               }}
             >
               <Text large>ADD GROUP</Text>
@@ -92,8 +94,8 @@ const Container = styled.View`
 `;
 
 const Header = styled.View`
-  flex-direction: row;
   justify-content: center;
+  align-items: center;
 `;
 
 const Groups = styled.View`
