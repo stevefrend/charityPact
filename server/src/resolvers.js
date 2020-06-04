@@ -1,4 +1,5 @@
 const databaseAPI = require('../src/models/databaseAPI');
+const combineGroups = require('../src/utils/combineGroups');
 
 module.exports = {
   Query: {
@@ -32,21 +33,13 @@ module.exports = {
       const groups = await databaseAPI.getGroups({ userId });
       const groupIds = [];
       groups.forEach((group) => groupIds.push([group.id]));
-
       const members = await databaseAPI.getMembers(groupIds);
 
-      console.log(members);
-      if (groups) {
-        return {
-          id: groups.id,
-          groupName: groups.group_name,
-          amount: groups.amount,
-          goalName: groups.goal_name,
-          charityLink: groups.charity_link,
-          deadline: groups.deadline,
-          members: members,
-        };
-      }
+      const combinedGroups = combineGroups(groups, members)
+
+      console.log('combinedGroups:', combinedGroups)
+      
+      return combinedGroups;
     },
   },
   Mutation: {
@@ -68,6 +61,13 @@ module.exports = {
         charityLink: newGroup.charity_link,
         deadline: newGroup.deadline,
         members: members,
+      };
+    },
+    completeTask: async (_, { userId, groupId }) => {
+      const user = await databaseAPI.createUser({ email, username, password });
+      return {
+        id: user.id,
+        username: user.username,
       };
     },
   },
