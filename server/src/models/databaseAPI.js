@@ -85,34 +85,50 @@ databaseAPI.addMembers  =  async ({group: {members}}, groupId) => {
 }
 
 databaseAPI.getGroups = async ({userId}) => {
-  const query = `select groups.id, groups.group_name, groups.amount, groups.goal_name, groups.deadline, groups.charity_link from groups join members on members.user_id = $1;`;
+  const query = `select groups.id, groups.group_name as "groupName", groups.amount, groups.goal_name as "goalName", groups.deadline, groups.charity_link as "charityLink" from groups join members on members.user_id = $1;`;
   const values = [userId]
 
   try {
     const res = await db.query(query, values)
     return res.rows;
   } catch(err) {
-    alert(err)
+    console.log(err)
   }
 }
 
 databaseAPI.getMembers = async (groupIds) => {
-  const query = format(`select members.user_id, members.username, members.days_completed, members.last_completed from members join groups on members.group_id = %L;`, groupIds)
+  const query = format(`select members.user_id, members.group_id, members.user_id, members.username, members.days_completed, members.last_completed from members join groups on members.group_id = %L;`, groupIds)
   const today = new Date();
 
   try {
     const res = await db.query(query)
-    // console.log(res.rows)
+    const members = res.rows;
+
 
     const filteredMembers = [];
     res.rows.forEach(obj => filteredMembers.push({
       id: obj.user_id,
+      groupId: obj.group_id,
       username: obj.username,
       daysCompleted: obj.days_completed,
       lastCompleted: obj.last_completed,
       completedToday: today - obj.lastCompleted > 86400 ? false : true
     }))
     return filteredMembers;
+  } catch(err) {
+    alert(err)
+  }
+}
+
+
+databaseAPI.completeTask = async ({userId, groupId}) => {
+  const today = new Date();
+  const query = `update members set days_completed = days_completed + 1, last_completed = $1 where user_id = $2 and group_id = $3;`;
+  const values = [today, userId, groupId]
+
+  try {
+    const res = await db.query(query, values)
+    return res.rows[0];
   } catch(err) {
     alert(err)
   }
