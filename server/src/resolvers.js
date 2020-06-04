@@ -67,8 +67,9 @@ module.exports = {
     completeTask: async (_, { userId, groupId }) => {
       await databaseAPI.completeTask({ userId, groupId });
       const groups = await databaseAPI.getGroups({ userId });
+      console.log(groups)
       const groupIds = [];
-      groups.forEach((group) => groupIds.push([group.id]));
+      groups.forEach((group) => groupIds.push(group.id));
       const members = await databaseAPI.getMembers(groupIds);
       const combinedGroups = combineGroups(groups, members)[0]
       return combinedGroups;
