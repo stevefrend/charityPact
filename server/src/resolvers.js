@@ -29,7 +29,6 @@ module.exports = {
       }
     },
     getGroups: async (_, { userId }, data) => {
-      console.log(data)
       const groups = await databaseAPI.getGroups({ userId });
       const groupIds = [];
       groups.forEach((group) => groupIds.push([group.id]));

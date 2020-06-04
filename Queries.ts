@@ -12,13 +12,18 @@ export const queries = {
   GET_GROUP: gql`
     query getIndividualGroup($groupId: ID!) {
       getIndividualGroup(groupId: $groupId) {
+        id
         groupName
         goalName
         amount
-        charity
+        charityLink
         deadline
-        members
-      }
+        members {
+          username
+          daysCompleted
+          completedToday
+        }
     }
+  }
   `
 };

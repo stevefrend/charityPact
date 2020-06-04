@@ -14,6 +14,7 @@ const Setup: React.FC<any> = ({ navigation }) => {
   }
 
   const onChange = (event: any, selectedDate: any) => {
+    // selects and stores date as ISO string
     const currentDate = selectedDate || date;
     setDate(currentDate);
   };
@@ -71,6 +72,7 @@ const Setup: React.FC<any> = ({ navigation }) => {
           </ModalView>
         </Modal>
         <CreateButton>
+          {/* HERE WE NEED TO TRIGGER A MUTATION TO CREATE THE GROUP */}
           <Text>Create Group</Text>
         </CreateButton>
       </Container>

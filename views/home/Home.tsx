@@ -1,12 +1,8 @@
 import * as React from 'react';
 import { SafeAreaView, StatusBar, ActivityIndicator } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import styled from 'styled-components/native';
 import { useQuery } from '@apollo/react-hooks';
 import { queries } from '../../Queries';
-import { gql } from 'apollo-boost';
 
 const mockGroups = [
   {
@@ -47,7 +43,7 @@ const Home: React.FC<any> = ({ navigation }) => {
       return (
         <Button
           onPress={() => {
-            navigation.navigate('GroupDashboard', { groupName: group.id });
+            navigation.navigate('GroupDashboard', { groupId: group.id });
           }}
           key={index + group.groupName}
         >

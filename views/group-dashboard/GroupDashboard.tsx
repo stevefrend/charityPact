@@ -7,6 +7,7 @@ import {
   Modal,
   Button as RButton,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import styled from 'styled-components/native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
@@ -14,43 +15,45 @@ import { Formik } from 'formik';
 import { useQuery } from '@apollo/react-hooks';
 import { queries } from '../../Queries';
 
-const dummyUsers = [
-  { username: 'Jae', doneToday: 'false', total: 15 },
-  { username: 'Charlie', doneToday: 'true', total: 7 },
-  { username: 'Brianna', doneToday: 'false', total: 20 },
-  { username: 'Steve', doneToday: 'false', total: 5 },
-];
+let firstRendered = false;
 
-const calculateTimeLeft = (date: any) => {
-  const ms: number = date.getTime() - new Date().getTime();
-  const days = Math.ceil((ms / 1000) / 60 / 60 / 24)    
-  return days;
-}
-
-const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
-  const { id } = route.params;
-  //! Send QUERY here with groupID, which should populate groupInformation (below), which is our local state for the current group
-  const { data, loading, error } = useQuery(queries.GET_GROUP, { variables: { id }})
+const GroupDashboard: React.FC<any> = ({ route, navigation }): any => {
+  const { groupId } = route.params;
+  const { data, loading, error } = useQuery(queries.GET_GROUP, { variables: { groupId }})
   const [groupInformation, setGroupInformation] = React.useState({
     groupName: '',
     amount: 0,
     goalName: '',
-    charity: '',
+    charityLink: '',
     deadline: undefined,
-    users: [],
+    members: [],
   });
+  // console.log(groupInformation)
   const [completeModalVisible, setCompleteModalVisible] = React.useState(false);
-  const [editModalVisible, setEditModalVisible] = React.useState(false); 
-  
-  if (!loading && data) {
-    setGroupInformation(previousState => {
-      return {
-        ...previousState,
-        ...data.getGroup
-      }
-    })
-    // console.log(groupInformation);
-     
+  const [editModalVisible, setEditModalVisible] = React.useState(false);   
+  if (loading) {    
+    return (
+      <SafeAreaView style={{ flex: 1, alignItems: "center" }}>
+        <ActivityIndicator size='large' color='#0000ff' />
+      </SafeAreaView>
+    );
+  } else if (!loading && data) {
+    if (!firstRendered) {
+      setGroupInformation(previousState => {
+        return {
+          ...previousState,
+          ...data.getIndividualGroup
+        }
+      })
+      firstRendered = true;
+    }
+
+    const calculateTimeLeft = (date: any) => {          
+      const ms: number = date - new Date().getTime();      
+      if (ms < 0) return "Deadline has passed"
+      const days = Math.ceil((ms / 1000) / 60 / 60 / 24)    
+      return `${days} left`;
+    }
   
     navigation.setOptions({
       headerTitle: groupInformation.groupName,
@@ -140,7 +143,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
                         <Text>Deadline:</Text>
                         <InputStyled
                           onChangeText={formikProps.handleChange('deadline')}
-                          value={formikProps.values.deadline.toString()}
+                          value={formikProps.values.deadline!}
                         />
                       </InputGroup>
                       <ModalButton onPress={formikProps.handleSubmit}>
@@ -156,7 +159,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
             </ModalView>
           </Modal>
           <Header>
-            <Text large>{calculateTimeLeft(groupInformation.deadline)} days left</Text>
+            <Text large>{calculateTimeLeft(groupInformation.deadline)}</Text>
           </Header>
           <Divider />
           <Info>
@@ -167,7 +170,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
             <Divider primary />
             <InfoBox>
               <Text small>Charity:</Text>
-              <Text small>{groupInformation.charity}</Text>
+              <Text small>{groupInformation.charityLink}</Text>
             </InfoBox>
           </Info>
           <Players>
@@ -176,7 +179,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
             </Text>
   
             <FlatList
-              data={dummyUsers}
+              data={groupInformation.members}
               ListHeaderComponent={
                 <View style={{ marginBottom: 10 }}>
                   <PlayerRow>
@@ -193,21 +196,21 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
                   <Divider primary />
                 </View>
               }
-              renderItem={({ item, index }): any => {
+              renderItem={({ item, index }): any => {                            
                 const checked =
-                  item.doneToday === 'true' ? (
+                  item.completedToday === true ? (
                     <AntDesign name='checkcircleo' size={22} color='green' />
                   ) : (
                     <MaterialIcons name='radio-button-unchecked' size={24} color='red' />
-                  );
+                  );                 
                 return (
                   <PlayerRow key={item.username + index}>
-                    <PlayerCell primary>{item.username}</PlayerCell>
+                    <PlayerCell primary>{item.username.toUpperCase()}</PlayerCell>
                     <PlayerCell primary style={{ textAlign: 'center' }}>
                       {checked}
                     </PlayerCell>
                     <PlayerCell primary style={{ textAlign: 'center' }}>
-                      {item.total}
+                      {item.daysCompleted}
                     </PlayerCell>
                   </PlayerRow>
                 );
