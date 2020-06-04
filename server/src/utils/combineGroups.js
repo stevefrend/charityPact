@@ -10,6 +10,7 @@ module.exports = combineGroups = (groups, members) => {
       }
     })
     combinedGroup.push(group)
+    // console.log(group)
   })
   return combinedGroup;
 }
