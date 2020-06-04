@@ -122,8 +122,9 @@ databaseAPI.getMembers = async (groupIds) => {
 
 
 databaseAPI.completeTask = async ({userId, groupId}) => {
-  const query = `update members set days_completed = days_completed + 1 where user_id = $1 and group_id = $2;`;
-  const values = [userId, gro]
+  const today = new Date();
+  const query = `update members set days_completed = days_completed + 1, last_completed = $1 where user_id = $2 and group_id = $3;`;
+  const values = [today, userId, groupId]
 
   try {
     const res = await db.query(query, values)

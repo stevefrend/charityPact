@@ -64,11 +64,12 @@ module.exports = {
       };
     },
     completeTask: async (_, { userId, groupId }) => {
-      const user = await databaseAPI.createUser({ email, username, password });
-      return {
-        id: user.id,
-        username: user.username,
-      };
+      const user = await databaseAPI.completeTask({ userId, groupId });
+      const groups = await databaseAPI.getGroups({ userId });
+      const groupIds = [];
+      groups.forEach((group) => groupIds.push([group.id]));
+      const members = await databaseAPI.getMembers(groupIds);
+      
     },
   },
 };
