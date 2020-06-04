@@ -33,7 +33,7 @@ const typeDefs = gql`
 
   # Types
   type Group {
-    groupId: ID!
+    id: ID!
     groupName: String!
     amount: Int!
     goalName: String!

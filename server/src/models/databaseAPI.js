@@ -85,12 +85,34 @@ databaseAPI.addMembers  =  async ({group: {members}}, groupId) => {
 }
 
 databaseAPI.getGroups = async ({userId}) => {
-  const query = `select * from groups join members on members.user_id = $1;`;
+  const query = `select groups.id, groups.group_name, groups.amount, groups.goal_name, groups.deadline, groups.charity_link from groups join members on members.user_id = $1;`;
   const values = [userId]
 
   try {
     const res = await db.query(query, values)
     return res.rows;
+  } catch(err) {
+    alert(err)
+  }
+}
+
+databaseAPI.getMembers = async (groupIds) => {
+  const query = format(`select members.user_id, members.username, members.days_completed, members.last_completed from members join groups on members.group_id = %L;`, groupIds)
+  const today = new Date();
+
+  try {
+    const res = await db.query(query)
+    // console.log(res.rows)
+
+    const filteredMembers = [];
+    res.rows.forEach(obj => filteredMembers.push({
+      id: obj.user_id,
+      username: obj.username,
+      daysCompleted: obj.days_completed,
+      lastCompleted: obj.last_completed,
+      completedToday: today - obj.lastCompleted > 86400 ? false : true
+    }))
+    return filteredMembers;
   } catch(err) {
     alert(err)
   }
