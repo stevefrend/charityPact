@@ -52,7 +52,7 @@ const Setup: React.FC<any> = ({ navigation }) => {
         <AddDateButton onPress={() => setModalView(true)}>
           <Text>Set End Date</Text>
         </AddDateButton>
-        <Modal animationType='fade' transparent={true} visible={modalView}>
+        <Modal animationType='slide' transparent={true} visible={modalView}>
           <ModalView>            
             <DateTimePicker testID='dateTimePicker' value={date} mode='date' onChange={onChange}/>
             <ModalButton

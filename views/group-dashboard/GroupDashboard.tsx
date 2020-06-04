@@ -19,6 +19,12 @@ const dummyUsers = [
   { username: 'Steve', doneToday: 'false', total: 5 },
 ];
 
+const calculateTimeLeft = (date: any) => {
+  const ms: number = date.getTime() - new Date().getTime();
+  const days = Math.ceil((ms / 1000) / 60 / 60 / 24)    
+  return days;
+}
+
 const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
   const { groupName } = route.params;
   //! Send QUERY here with groupID, which should populate groupInformation (below), which is our local state for the current group
@@ -26,13 +32,13 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
     groupName: 'Coworkers',
     amount: 150,
     goalName: 'Meditate',
-    charity: 'www.google.com',
-    deadline: Date.now(),
+    charity: 'Red Cross',
+    deadline: new Date('2020-06-06T03:04:05.678Z'),
     users: ['Jae', 'Steve', 'Charlie', 'Brianna'],
   });
-  console.log(groupInformation);
+  // console.log(groupInformation);
   const [completeModalVisible, setCompleteModalVisible] = React.useState(false);
-  const [editModalVisible, setEditModalVisible] = React.useState(false);
+  const [editModalVisible, setEditModalVisible] = React.useState(false);  
 
   navigation.setOptions({
     headerTitle: groupName,
@@ -90,27 +96,42 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
                 }}
               >
                 {(formikProps) => (
-                  <View>
-                    <TextInput
-                      onChangeText={formikProps.handleChange('groupName')}
-                      value={formikProps.values.groupName}
-                    />
-                    <TextInput
-                      onChangeText={formikProps.handleChange('goalName')}
-                      value={formikProps.values.goalName}
-                    />
-                    <TextInput
-                      onChangeText={formikProps.handleChange('amount')}
-                      value={formikProps.values.amount.toString()}
-                    />
-                    <TextInput
-                      onChangeText={formikProps.handleChange('charity')}
-                      value={formikProps.values.charity}
-                    />
-                    <TextInput
-                      onChangeText={formikProps.handleChange('deadline')}
-                      value={formikProps.values.deadline.toString()}
-                    />
+                  <View style={{ backgroundColor: 'pink' }}>
+                    <InputGroup>
+                      <Text>Name:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('groupName')}
+                        value={formikProps.values.groupName}
+                      />
+                    </InputGroup>
+                    <InputGroup>
+                      <Text>Goal:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('goalName')}
+                        value={formikProps.values.goalName}
+                      />
+                    </InputGroup>
+                    <InputGroup>
+                      <Text>Donation:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('amount')}
+                        value={formikProps.values.amount.toString()}
+                      />
+                    </InputGroup>
+                    <InputGroup>
+                      <Text>Charity:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('charity')}
+                        value={formikProps.values.charity}
+                      />
+                    </InputGroup>
+                    <InputGroup>
+                      <Text>Deadline:</Text>
+                      <InputStyled
+                        onChangeText={formikProps.handleChange('deadline')}
+                        value={formikProps.values.deadline.toString()}
+                      />
+                    </InputGroup>
                     <ModalButton onPress={formikProps.handleSubmit}>
                       <Text>Submit</Text>
                     </ModalButton>
@@ -124,7 +145,7 @@ const GroupDashboard: React.FC<any> = ({ route, navigation }) => {
           </ModalView>
         </Modal>
         <Header>
-          <Text large>{} days left</Text>
+          <Text large>{calculateTimeLeft(groupInformation.deadline)} days left</Text>
         </Header>
         <Divider />
         <Info>
@@ -318,11 +339,24 @@ const ModalBox = styled.View`
   border-radius: 10px;
 `;
 
-const ModalButton = styled.TouchableOpacity`
-  padding: 8px 50px;
-  margin-top: 30px;
+const ModalButton = styled.TouchableOpacity`  
+  flex-direction: row;
+  justify-content: center;
+  padding: 8px 20px;
+  margin-top: 20px;
   background-color: lightskyblue;
   border-radius: 5px;
+`;
+
+const InputGroup = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid black;
+`;
+
+const InputStyled = styled.TextInput`
+  /* padding: 10px; */
 `;
 
 export default GroupDashboard;
